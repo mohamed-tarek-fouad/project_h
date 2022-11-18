@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE `router` MODIFY `phoneNumber` VARCHAR(191) NOT NULL DEFAULT 'null',
+    MODIFY `whatsapp` VARCHAR(191) NOT NULL DEFAULT 'null',
+    MODIFY `startAt` VARCHAR(191) NOT NULL DEFAULT 'null',
+    MODIFY `endAt` VARCHAR(191) NOT NULL DEFAULT 'null',
+    MODIFY `estimatedTime` INTEGER NOT NULL DEFAULT 0,
+    MODIFY `fees` DOUBLE NOT NULL DEFAULT 0;

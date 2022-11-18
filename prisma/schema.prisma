@@ -1,0 +1,100 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Users {
+  id          Int           @id @default(autoincrement())
+  firstname   String
+  lastname    String
+  email       String        @unique
+  password    String
+  address     String
+  phoneNumber String
+  profilePic  String
+  info        String
+  tokens      tokens[]
+  votes       Votes[]
+  role        UserRole      @default(user)
+  booking     Booking[]
+  routerAdmin RouterAdmin[]
+}
+
+model Votes {
+  id     Int    @id @default(autoincrement())
+  voteId String
+  userId Int
+  user   Users  @relation(fields: [userId], references: [id])
+  vote   Router @relation(fields: [voteId], references: [domain])
+  rate   Int
+}
+
+model tokens {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  expiresAt DateTime
+  user      Users    @relation(fields: [userId], references: [id])
+}
+
+model Router {
+  domain        String        @id
+  settings      Json
+  phoneNumber   String        @default("null")
+  whatsapp      String        @default("null")
+  startAt       String        @default("null")
+  endAt         String        @default("null")
+  days          String        @default("all")
+  estimatedTime Int           @default(0)
+  location      String
+  rating        Float         @default(0)
+  voters        Int           @default(0)
+  fees          Float         @default(0)
+  type          Speciality
+  routerAdmin   RouterAdmin[]
+  pages         Pages[]
+  booking       Booking[]
+  votes         Votes[]
+}
+
+model RouterAdmin {
+  id       Int    @id @default(autoincrement())
+  routerId String
+  userId   Int
+  router   Router @relation(fields: [routerId], references: [domain])
+  user     Users  @relation(fields: [userId], references: [id])
+}
+
+model Pages {
+  url      String
+  page     Json
+  routerId String
+  router   Router @relation(fields: [routerId], references: [domain])
+
+  @@id([url, routerId])
+}
+
+model Booking {
+  id          Int    @id @default(autoincrement())
+  bookingID   String
+  bookingInfo Router @relation(fields: [bookingID], references: [domain])
+  userId      Int
+  user        Users  @relation(fields: [userId], references: [id])
+}
+
+enum UserRole {
+  user
+  admin
+}
+
+enum Speciality {
+  hospital
+  clinic
+  lab
+}
