@@ -9,7 +9,7 @@ import { UpdateRouterDto } from "./dtos/updateRouter.dto";
 @Injectable()
 export class RouterService {
   constructor(private prisma: PrismaService) {}
-  async createRouter(createRouterDto: CreateRouterDto) {
+  async createRouter(createRouterDto: CreateRouterDto, req) {
     const routerExists = await this.prisma.router.findUnique({
       where: {
         domain: createRouterDto.domain,
@@ -23,6 +23,12 @@ export class RouterService {
     }
     const router = await this.prisma.router.create({
       data: createRouterDto,
+    });
+    await this.prisma.routerAdmin.create({
+      data: {
+        routerId: createRouterDto.domain,
+        userId: req.user.userId,
+      },
     });
     return router;
   }

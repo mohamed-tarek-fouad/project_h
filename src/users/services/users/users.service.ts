@@ -1,6 +1,6 @@
-import { PrismaService } from './../../../prisma.service';
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { UpdateUserDto } from './../../dtos/updateUser.dto';
+import { PrismaService } from "./../../../prisma.service";
+import { Injectable, HttpException, HttpStatus } from "@nestjs/common";
+import { UpdateUserDto } from "./../../dtos/updateUser.dto";
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
@@ -16,7 +16,7 @@ export class UsersService {
       },
     });
     if (!user) {
-      throw new HttpException('User not found', HttpStatus.BAD_REQUEST);
+      throw new HttpException("User not found", HttpStatus.BAD_REQUEST);
     }
 
     const updatedUser = await this.prisma.users.update({

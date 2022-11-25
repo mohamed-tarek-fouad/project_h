@@ -1,12 +1,12 @@
 /* eslint-disable prettier/prettier */
-
-import { Injectable } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
-import { PrismaService } from './../prisma.service';
-import { CreateUserDto } from './dtos/createUser.dto';
-import * as bcrypt from 'bcrypt';
-import { HttpException } from '@nestjs/common';
-import { HttpStatus } from '@nestjs/common';
+import { Cron, CronExpression } from "@nestjs/schedule";
+import { Injectable } from "@nestjs/common";
+import { JwtService } from "@nestjs/jwt";
+import { PrismaService } from "./../prisma.service";
+import { CreateUserDto } from "./dtos/createUser.dto";
+import * as bcrypt from "bcrypt";
+import { HttpException } from "@nestjs/common";
+import { HttpStatus } from "@nestjs/common";
 @Injectable()
 export class AuthService {
   constructor(private jwtServise: JwtService, private prisma: PrismaService) {}
@@ -51,7 +51,7 @@ export class AuthService {
     });
     if (userExist) {
       throw new HttpException(
-        'this user already exist',
+        "this user already exist",
         HttpStatus.BAD_REQUEST,
       );
     }
@@ -69,5 +69,29 @@ export class AuthService {
       },
     });
     return user;
+  }
+  @Cron(CronExpression.EVERY_HOUR)
+  async deleteExpiredTokens() {
+    console.log("Checking for expired tokens...");
+    const expiredTokens = await this.prisma.tokens.findMany({
+      where: {
+        expiresAt: {
+          lte: new Date(),
+        },
+      },
+    });
+    if (expiredTokens.length > 0) {
+      console.log(`Found ${expiredTokens.length} expired tokens`);
+      for (const token of expiredTokens) {
+        await this.prisma.tokens.delete({
+          where: {
+            id: token.id,
+          },
+        });
+      }
+      console.log("Deleted expired tokens");
+    } else {
+      console.log("No expired tokens found");
+    }
   }
 }

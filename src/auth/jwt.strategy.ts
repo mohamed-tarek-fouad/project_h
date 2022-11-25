@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
-import { ExtractJwt, Strategy } from 'passport-jwt';
-import { PassportStrategy } from '@nestjs/passport';
-import { Injectable } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { UnauthorizedException } from '@nestjs/common';
+import { ExtractJwt, Strategy } from "passport-jwt";
+import { PassportStrategy } from "@nestjs/passport";
+import { Injectable } from "@nestjs/common";
+import { AuthService } from "./auth.service";
+import { UnauthorizedException } from "@nestjs/common";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -23,7 +23,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     }
     return {
       tokenId: payload.user.tokenId,
-      userId: payload.user.id,
+      userId: payload.user.userId,
       role: payload.user.role,
     };
   }

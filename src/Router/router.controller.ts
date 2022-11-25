@@ -1,14 +1,25 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Body, Param, Patch, Get } from "@nestjs/common";
+import {
+  Controller,
+  Post,
+  Body,
+  Param,
+  Patch,
+  Get,
+  Req,
+  UseGuards,
+} from "@nestjs/common";
 import { RouterService } from "./router.service";
 import { CreateRouterDto } from "./dtos/createRouter.dto";
 import { UpdateRouterDto } from "./dtos/updateRouter.dto";
+import { JwtAuthGuard } from "./../jwtAuthGuard";
 @Controller("router")
 export class RouterController {
   constructor(private routerService: RouterService) {}
+  @UseGuards(JwtAuthGuard)
   @Post("")
-  createRouter(@Body() createRouterDto: CreateRouterDto) {
-    return this.routerService.createRouter(createRouterDto);
+  createRouter(@Body() createRouterDto: CreateRouterDto, @Req() req) {
+    return this.routerService.createRouter(createRouterDto, req);
   }
   @Patch("update/:domain")
   updateRouter(
