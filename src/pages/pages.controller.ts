@@ -4,14 +4,21 @@ import { Controller } from "@nestjs/common";
 import { CreatePageDto } from "./dtos/createPage.dto";
 import { PagesService } from "./pages.service";
 import { UpdatePageDto } from "./dtos/updatePage.dto";
+import { ApiParam } from "@nestjs/swagger";
 
 @Controller("pages")
 export class PagesController {
   constructor(private pagesService: PagesService) {}
   @Post(":id")
+  @ApiParam({
+    name: "id",
+    type: "string",
+    example: "elganzori",
+  })
   createPage(@Body() createPageDto: CreatePageDto, @Param("id") id: string) {
     return this.pagesService.createPage(createPageDto, id);
   }
+
   @Patch("update/:router/:url/:ex1?/:ex2?/:ex3?/:ex4?/:ex5?/:ex6?")
   updatePage(
     @Body() updatePageDto: UpdatePageDto,
