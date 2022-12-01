@@ -40,7 +40,12 @@ export class AuthService {
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
       },
     });
+    delete user.password;
+    delete user.info;
+    delete user.address;
+    delete user.phoneNumber;
     return {
+      ...user,
       access_token: this.jwtServise.sign({
         user: { userId: user.id, role: user.role, tokenId: token.id },
       }),
