@@ -44,6 +44,12 @@ export class AuthController {
   @UseInterceptors(
     FileInterceptor("profilePic", {
       preservePath: true,
+      fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(new Error("Only image files are allowed!"), false);
+        }
+        cb(null, true);
+      },
       storage: diskStorage({
         destination: "./uploads",
         filename: (req, file, cb) => {
