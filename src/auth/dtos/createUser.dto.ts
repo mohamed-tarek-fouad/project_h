@@ -48,7 +48,7 @@ export class CreateUserDto {
   @ApiProperty({ example: "gamed neeeeeeeeeeeeeeeek" })
   @IsOptional()
   info: string;
-  @ApiProperty({ example: "3zmaa" })
+  //@ApiProperty({ example: "3zmaa" })
   @IsOptional()
   profilePic: any;
 }

@@ -43,6 +43,7 @@ export class AuthController {
   @Post("register")
   @UseInterceptors(
     FileInterceptor("profilePic", {
+      preservePath: true,
       storage: diskStorage({
         destination: "./uploads",
         filename: (req, file, cb) => {
@@ -57,18 +58,7 @@ export class AuthController {
       }),
     }),
   )
-  register(
-    @Body() createUserDto: CreateUserDto,
-    @UploadedFile(
-      new ParseFilePipeBuilder()
-        .addFileTypeValidator({
-          fileType: "png",
-        })
-        .build(),
-    )
-    profilePic?: Express.Multer.File,
-  ) {
-    console.log(profilePic);
+  register(@Body() createUserDto: CreateUserDto, @UploadedFile() profilePic) {
     return this.authService.register(createUserDto, profilePic);
   }
   @ApiBearerAuth("access-token")
