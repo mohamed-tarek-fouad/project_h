@@ -1,10 +1,19 @@
 /* eslint-disable prettier/prettier */
-import { Controller, UseGuards, Post, Req, Body } from "@nestjs/common";
+import {
+  Controller,
+  UseGuards,
+  Post,
+  Req,
+  Body,
+  UseInterceptors,
+  UploadedFile,
+} from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport/dist";
 import { JwtAuthGuard } from "src/jwtAuthGuard";
 import { AuthService } from "./auth.service";
 import { CreateUserDto } from "./dtos/createUser.dto";
 import { ApiBearerAuth, ApiBody } from "@nestjs/swagger/dist";
+import { FileInterceptor } from "@nestjs/platform-express";
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -29,7 +38,11 @@ export class AuthController {
     return this.authService.login(req.user);
   }
   @Post("register")
-  register(@Body() createUserDto: CreateUserDto) {
+  @UseInterceptors(FileInterceptor("image"))
+  register(
+    @Body() createUserDto: CreateUserDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
     return this.authService.register(createUserDto);
   }
   @ApiBearerAuth("access-token")
