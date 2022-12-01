@@ -16,10 +16,10 @@ model Users {
   lastname    String
   email       String        @unique
   password    String
-  address     String
+  address     String        @default("null")
   phoneNumber String
-  profilePic  String
-  info        String
+  profilePic  String        @default("null")
+  info        String        @default("null")
   tokens      tokens[]
   votes       Votes[]
   role        UserRole      @default(user)

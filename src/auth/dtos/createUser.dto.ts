@@ -50,5 +50,5 @@ export class CreateUserDto {
   info: string;
   @ApiProperty({ example: "3zmaa" })
   @IsOptional()
-  profilePic: string;
+  profilePic: any;
 }
