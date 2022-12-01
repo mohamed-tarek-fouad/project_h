@@ -7,7 +7,6 @@ import { CreateUserDto } from "./dtos/createUser.dto";
 import * as bcrypt from "bcrypt";
 import { HttpException } from "@nestjs/common";
 import { HttpStatus } from "@nestjs/common";
-import { MulterModule } from "@nestjs/platform-express/multer";
 @Injectable()
 export class AuthService {
   constructor(private jwtServise: JwtService, private prisma: PrismaService) {}
@@ -48,10 +47,6 @@ export class AuthService {
     };
   }
   async register(userDto: CreateUserDto, profilePic) {
-    // MulterModule.register({
-    //   dest: "./../../images",
-    // });
-    console.log(profilePic);
     const userExist = await this.prisma.users.findUnique({
       where: {
         email: userDto.email,
@@ -66,7 +61,10 @@ export class AuthService {
     const saltOrRounds = 10;
     userDto.password = await bcrypt.hash(userDto.password, saltOrRounds);
     const user = await this.prisma.users.create({
-      data: userDto,
+      data: {
+        ...userDto,
+        profilePic: profilePic ? profilePic.path : "null",
+      },
     });
     return user;
   }
