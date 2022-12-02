@@ -11,6 +11,10 @@ export class UsersController {
   allUsers() {
     return this.usersService.allUsers();
   }
+  @Get(":id")
+  userById(@Param("id") id: string) {
+    return this.usersService.userById(id);
+  }
 
   @Patch(":id")
   updateUser(@Param("id") id: number, @Body() updateUserDto: UpdateUserDto) {
