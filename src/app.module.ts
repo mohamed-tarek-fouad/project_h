@@ -6,6 +6,8 @@ import { Module } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { JwtAuthGuard } from "./jwtAuthGuard";
 import { BullModule } from "@nestjs/bull";
+import { MailerModule } from "@nestjs-modules/mailer";
+import { ConfigModule, ConfigService } from "@nestjs/config";
 @Module({
   imports: [
     VotesModule,
@@ -19,6 +21,21 @@ import { BullModule } from "@nestjs/bull";
         port: 6379,
       },
     }),
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: async (config: ConfigService) => ({
+        transport: {
+          host: config.get("EMAIL_HOST"),
+          secure: false,
+          auth: {
+            user: config.get("EMAIL_USER"),
+            pass: config.get("EMAIL_PASSWORD"),
+          },
+        },
+      }),
+      inject: [ConfigService],
+    }),
+    ConfigModule.forRoot(),
   ],
 
   controllers: [],

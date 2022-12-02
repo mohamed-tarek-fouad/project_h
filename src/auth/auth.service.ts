@@ -7,102 +7,219 @@ import { CreateUserDto } from "./dtos/createUser.dto";
 import * as bcrypt from "bcrypt";
 import { HttpException } from "@nestjs/common";
 import { HttpStatus } from "@nestjs/common";
+import { MailerService } from "@nestjs-modules/mailer/dist";
+import { ForgetPasswordDto } from "./dtos/forgetPassword.dto";
+import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 @Injectable()
 export class AuthService {
-  constructor(private jwtServise: JwtService, private prisma: PrismaService) {}
+  constructor(
+    private jwtServise: JwtService,
+    private prisma: PrismaService,
+    private mailerService: MailerService,
+  ) {}
   async validateUser(email: string, password: string) {
-    const user = await this.prisma.users.findUnique({
-      where: {
-        email,
-      },
-    });
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: {
+          email,
+        },
+      });
 
-    if (user) {
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (isMatch) {
-        return user;
+      if (user) {
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (isMatch) {
+          return user;
+        }
       }
+      return null;
+    } catch (err) {
+      return err;
     }
-    return null;
   }
   async validateToken(id) {
-    const token = await this.prisma.tokens.findUnique({
-      where: {
-        id,
-      },
-    });
-    return token;
+    try {
+      const token = await this.prisma.tokens.findUnique({
+        where: {
+          id,
+        },
+      });
+      return token;
+    } catch (err) {
+      return err;
+    }
   }
   async login(user: any): Promise<any> {
-    const token = await this.prisma.tokens.create({
-      data: {
-        userId: user.id,
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      },
-    });
-    delete user.password;
-    delete user.info;
-    delete user.address;
-    delete user.phoneNumber;
-    return {
-      ...user,
-      access_token: this.jwtServise.sign({
-        user: { userId: user.id, role: user.role, tokenId: token.id },
-      }),
-    };
+    try {
+      const token = await this.prisma.tokens.create({
+        data: {
+          userId: user.id,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        },
+      });
+      delete user.password;
+      delete user.info;
+      delete user.address;
+      delete user.phoneNumber;
+      return {
+        ...user,
+        access_token: this.jwtServise.sign({
+          user: { userId: user.id, role: user.role, tokenId: token.id },
+        }),
+      };
+    } catch (err) {
+      return err;
+    }
   }
   async register(userDto: CreateUserDto, profilePic) {
-    const userExist = await this.prisma.users.findUnique({
-      where: {
-        email: userDto.email,
-      },
-    });
-    if (userExist) {
-      throw new HttpException(
-        "this user already exist",
-        HttpStatus.BAD_REQUEST,
-      );
+    try {
+      const userExist = await this.prisma.users.findUnique({
+        where: {
+          email: userDto.email,
+        },
+      });
+      if (userExist) {
+        throw new HttpException(
+          "this user already exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const saltOrRounds = 10;
+      userDto.password = await bcrypt.hash(userDto.password, saltOrRounds);
+      const user = await this.prisma.users.create({
+        data: {
+          ...userDto,
+          profilePic: profilePic ? profilePic.path : "null",
+        },
+      });
+      return user;
+    } catch (err) {
+      return err;
     }
-    const saltOrRounds = 10;
-    userDto.password = await bcrypt.hash(userDto.password, saltOrRounds);
-    const user = await this.prisma.users.create({
-      data: {
-        ...userDto,
-        profilePic: profilePic ? profilePic.path : "null",
-      },
-    });
-    return user;
   }
   async logout(req) {
-    const user = await this.prisma.tokens.delete({
-      where: {
-        id: req.user.tokenId,
-      },
-    });
-    return user;
+    try {
+      const user = await this.prisma.tokens.delete({
+        where: {
+          id: req.user.tokenId,
+        },
+      });
+      return user;
+    } catch (err) {
+      return err;
+    }
   }
+
+  async forgetPassword(forgetPasswordDto: ForgetPasswordDto) {
+    try {
+      const validateUser = await this.prisma.users.findUnique({
+        where: {
+          email: forgetPasswordDto.email,
+        },
+      });
+      if (!validateUser) {
+        throw new HttpException(
+          "this user doesn't exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+
+      const secret = process.env.ACCESS_SECRET + validateUser.password;
+      const token = this.jwtServise.sign(
+        { email: forgetPasswordDto.email, id: validateUser.id },
+        {
+          secret,
+          expiresIn: 60 * 15,
+        },
+      );
+
+      const url = `http://localhost:3001/auth/resetPassword/${validateUser.id}/${token}`;
+
+      await this.mailerService.sendMail({
+        to: forgetPasswordDto.email,
+        from: process.env.EMAIL_USER,
+        // from: '"Support Team" <support@example.com>', // override default from
+        subject: "Reset Password Confirmation Email",
+        //template: "./templates/confirmation", // `.hbs` extension is appended automatically
+        context: {
+          // ✏️ filling curly brackets with content
+          name: validateUser.firstname,
+          url,
+        },
+
+        text: url,
+      });
+    } catch (err) {
+      return err;
+    }
+  }
+  async resetPassword(
+    resetPasswordDto: ResetPasswordDto,
+    id: string,
+    token: string,
+  ) {
+    try {
+      const validateUser = await this.prisma.users.findUnique({
+        where: {
+          id: parseInt(id),
+        },
+      });
+      if (!validateUser) {
+        throw new HttpException(
+          "this user doesn't exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const secret = process.env.ACCESS_SECRET + validateUser.password;
+      const payload = this.jwtServise.verify(token, { secret });
+      if (payload.id !== validateUser.id) {
+        throw new HttpException(
+          "this user doesn't exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      const saltOrRounds = 10;
+      resetPasswordDto.password = await bcrypt.hash(
+        resetPasswordDto.password,
+        saltOrRounds,
+      );
+      const user = await this.prisma.users.update({
+        where: { id: parseInt(id) },
+        data: {
+          password: resetPasswordDto.password,
+        },
+      });
+      return user;
+    } catch (err) {
+      return err;
+    }
+  }
+
   @Cron(CronExpression.EVERY_HOUR)
   async deleteExpiredTokens() {
-    console.log("Checking for expired tokens...");
-    const expiredTokens = await this.prisma.tokens.findMany({
-      where: {
-        expiresAt: {
-          lte: new Date(),
-        },
-      },
-    });
-    if (expiredTokens.length > 0) {
-      console.log(`Found ${expiredTokens.length} expired tokens`);
-      for (const token of expiredTokens) {
-        await this.prisma.tokens.delete({
-          where: {
-            id: token.id,
+    try {
+      console.log("Checking for expired tokens...");
+      const expiredTokens = await this.prisma.tokens.findMany({
+        where: {
+          expiresAt: {
+            lte: new Date(),
           },
-        });
+        },
+      });
+      if (expiredTokens.length > 0) {
+        console.log(`Found ${expiredTokens.length} expired tokens`);
+        for (const token of expiredTokens) {
+          await this.prisma.tokens.delete({
+            where: {
+              id: token.id,
+            },
+          });
+        }
+        console.log("Deleted expired tokens");
+      } else {
+        console.log("No expired tokens found");
       }
-      console.log("Deleted expired tokens");
-    } else {
-      console.log("No expired tokens found");
+    } catch (err) {
+      return err;
     }
   }
 }

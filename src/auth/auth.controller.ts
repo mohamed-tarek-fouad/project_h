@@ -7,6 +7,7 @@ import {
   Body,
   UseInterceptors,
   UploadedFile,
+  Param,
 } from "@nestjs/common";
 import { AuthGuard } from "@nestjs/passport/dist";
 import { JwtAuthGuard } from "src/jwtAuthGuard";
@@ -16,6 +17,8 @@ import { ApiBearerAuth, ApiBody } from "@nestjs/swagger/dist";
 import { FileInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { extname } from "path";
+import { ForgetPasswordDto } from "./dtos/forgetPassword.dto";
+import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -69,5 +72,17 @@ export class AuthController {
   @Post("logout")
   logout(@Req() req) {
     return this.authService.logout(req);
+  }
+  @Post("forgetPassword")
+  forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    return this.authService.forgetPassword(forgetPasswordDto);
+  }
+  @Post("resetPassword/:id/:token")
+  resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Param("id") id: string,
+    @Param("token") token: string,
+  ) {
+    return this.authService.resetPassword(resetPasswordDto, id, token);
   }
 }
