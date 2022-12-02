@@ -5,10 +5,10 @@ CREATE TABLE `Users` (
     `lastname` VARCHAR(191) NOT NULL,
     `email` VARCHAR(191) NOT NULL,
     `password` VARCHAR(191) NOT NULL,
-    `address` VARCHAR(191) NOT NULL,
+    `address` VARCHAR(191) NOT NULL DEFAULT 'null',
     `phoneNumber` VARCHAR(191) NOT NULL,
-    `profilePic` VARCHAR(191) NOT NULL,
-    `info` VARCHAR(191) NOT NULL,
+    `profilePic` VARCHAR(191) NOT NULL DEFAULT 'null',
+    `info` VARCHAR(191) NOT NULL DEFAULT 'null',
     `role` ENUM('user', 'admin') NOT NULL DEFAULT 'user',
 
     UNIQUE INDEX `Users_email_key`(`email`),
@@ -38,16 +38,16 @@ CREATE TABLE `tokens` (
 CREATE TABLE `Router` (
     `domain` VARCHAR(191) NOT NULL,
     `settings` JSON NOT NULL,
-    `phoneNumber` VARCHAR(191) NOT NULL,
-    `whatsapp` VARCHAR(191) NOT NULL,
-    `startAt` VARCHAR(191) NOT NULL,
-    `endAt` VARCHAR(191) NOT NULL,
+    `phoneNumber` VARCHAR(191) NOT NULL DEFAULT 'null',
+    `whatsapp` VARCHAR(191) NOT NULL DEFAULT 'null',
+    `startAt` VARCHAR(191) NOT NULL DEFAULT 'null',
+    `endAt` VARCHAR(191) NOT NULL DEFAULT 'null',
     `days` VARCHAR(191) NOT NULL DEFAULT 'all',
-    `estimatedTime` INTEGER NOT NULL,
+    `estimatedTime` INTEGER NOT NULL DEFAULT 0,
     `location` VARCHAR(191) NOT NULL,
     `rating` DOUBLE NOT NULL DEFAULT 0,
     `voters` INTEGER NOT NULL DEFAULT 0,
-    `fees` DOUBLE NOT NULL,
+    `fees` DOUBLE NOT NULL DEFAULT 0,
     `type` ENUM('hospital', 'clinic', 'lab') NOT NULL,
 
     PRIMARY KEY (`domain`)
@@ -76,6 +76,7 @@ CREATE TABLE `Booking` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
     `bookingID` VARCHAR(191) NOT NULL,
     `userId` INTEGER NOT NULL,
+    `details` JSON NOT NULL,
 
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

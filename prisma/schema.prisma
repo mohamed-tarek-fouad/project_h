@@ -86,6 +86,7 @@ model Booking {
   bookingInfo Router @relation(fields: [bookingID], references: [domain])
   userId      Int
   user        Users  @relation(fields: [userId], references: [id])
+  details     Json
 }
 
 enum UserRole {
