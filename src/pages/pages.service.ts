@@ -10,7 +10,7 @@ import { Concat } from "./nestedPagesConcat";
 @Injectable()
 export class PagesService {
   constructor(private prisma: PrismaService, private concat: Concat) {}
-  async createPage(createPageDto: CreatePageDto, id) {
+  async createPage(createPageDto: CreatePageDto, id: string) {
     try {
       const pageExist = await this.prisma.pages.findFirst({
         where: {
@@ -37,7 +37,7 @@ export class PagesService {
       const page = await this.prisma.pages.create({
         data: { ...createPageDto, routerId: id },
       });
-      return page;
+      return { ...page, message: "page created successfully" };
     } catch (err) {
       return err;
     }
@@ -85,7 +85,7 @@ export class PagesService {
         data: updatePageDto,
       });
 
-      throw new HttpException("page updated successfully", HttpStatus.CREATED);
+      return { message: "updated page successfully" };
     } catch (err) {
       return err;
     }
@@ -104,7 +104,7 @@ export class PagesService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      return page;
+      return { ...page, message: "page fetched successfully" };
     } catch (err) {
       return err;
     }
@@ -128,6 +128,7 @@ export class PagesService {
           AND: [{ routerId: router }, { url }],
         },
       });
+      return { message: "page delted successfully" };
     } catch (err) {
       return err;
     }

@@ -36,7 +36,7 @@ export class AuthService {
       return err;
     }
   }
-  async validateToken(id) {
+  async validateToken(id: number) {
     try {
       const token = await this.prisma.tokens.findUnique({
         where: {
@@ -61,6 +61,7 @@ export class AuthService {
       delete user.address;
       delete user.phoneNumber;
       return {
+        message: "loged in successfully",
         ...user,
         access_token: this.jwtServise.sign({
           user: { userId: user.id, role: user.role, tokenId: token.id },
@@ -78,10 +79,7 @@ export class AuthService {
         },
       });
       if (userExist) {
-        throw new HttpException(
-          "this user already exist",
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException("user already exist", HttpStatus.BAD_REQUEST);
       }
       const saltOrRounds = 10;
       userDto.password = await bcrypt.hash(userDto.password, saltOrRounds);
@@ -91,7 +89,7 @@ export class AuthService {
           profilePic: profilePic ? profilePic.path : "null",
         },
       });
-      return user;
+      return { ...user, message: "user already exists" };
     } catch (err) {
       return err;
     }
@@ -103,7 +101,7 @@ export class AuthService {
           id: req.user.tokenId,
         },
       });
-      return user;
+      return { ...user, message: "loged out successfully" };
     } catch (err) {
       return err;
     }
@@ -117,10 +115,7 @@ export class AuthService {
         },
       });
       if (!validateUser) {
-        throw new HttpException(
-          "this user doesn't exist",
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
       }
 
       const secret = process.env.ACCESS_SECRET + validateUser.password;
@@ -148,6 +143,7 @@ export class AuthService {
 
         text: url,
       });
+      return { message: "email sent successfully" };
     } catch (err) {
       return err;
     }
@@ -164,18 +160,12 @@ export class AuthService {
         },
       });
       if (!validateUser) {
-        throw new HttpException(
-          "this user doesn't exist",
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
       }
       const secret = process.env.ACCESS_SECRET + validateUser.password;
       const payload = this.jwtServise.verify(token, { secret });
       if (payload.id !== validateUser.id) {
-        throw new HttpException(
-          "this user doesn't exist",
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
       }
       const saltOrRounds = 10;
       resetPasswordDto.password = await bcrypt.hash(
@@ -188,7 +178,7 @@ export class AuthService {
           password: resetPasswordDto.password,
         },
       });
-      return user;
+      return { ...user, message: "reset password successfully" };
     } catch (err) {
       return err;
     }

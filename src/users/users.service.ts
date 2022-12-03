@@ -7,7 +7,10 @@ export class UsersService {
   async allUsers() {
     try {
       const user = await this.prisma.users.findMany({});
-      return user;
+      if (user.length === 0) {
+        throw new HttpException("user does'nt exist", HttpStatus.BAD_REQUEST);
+      }
+      return { ...user, message: "fetched all users successfully" };
     } catch (err) {
       return err;
     }
@@ -21,14 +24,14 @@ export class UsersService {
         },
       });
       if (!user) {
-        throw new HttpException("User not found", HttpStatus.BAD_REQUEST);
+        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
       }
 
       const updatedUser = await this.prisma.users.update({
         where: { id },
         data: updateUserDto,
       });
-      return updatedUser;
+      return { ...updatedUser, message: "user updated successfully" };
     } catch (err) {
       return err;
     }
@@ -40,6 +43,12 @@ export class UsersService {
           id: parseInt(id),
         },
       });
+      if (!user) {
+        throw new HttpException(
+          "this user does'nt exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       return user;
     } catch (err) {
       return err;

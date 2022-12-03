@@ -46,7 +46,7 @@ export class VotesService {
             userId: parseInt(req.user.userId),
           },
         });
-        return updatedVote;
+        return { ...updatedVote, message: "vote updated successfully" };
       } else {
         const createdVote = await this.prisma.votes.create({
           data: {
@@ -54,7 +54,7 @@ export class VotesService {
             userId: parseInt(req.user.userId),
           },
         });
-        return createdVote;
+        return { ...createdVote, message: "vote created successfully" };
       }
     } catch (err) {
       return err;

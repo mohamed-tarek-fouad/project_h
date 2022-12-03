@@ -31,12 +31,12 @@ export class RouterService {
           userId: req.user.userId,
         },
       });
-      return router;
+      return { ...router, message: "router created successfully" };
     } catch (err) {
       err;
     }
   }
-  async updateRouter(updateRouterDto: UpdateRouterDto, domain) {
+  async updateRouter(updateRouterDto: UpdateRouterDto, domain: string) {
     try {
       const routerExist = await this.prisma.router.findUnique({
         where: {
@@ -55,7 +55,7 @@ export class RouterService {
         },
         data: updateRouterDto,
       });
-      return updatedRoute;
+      return { ...updatedRoute, message: "router updated successfully" };
     } catch (err) {
       return err;
     }
@@ -63,12 +63,18 @@ export class RouterService {
   async allRouters() {
     try {
       const routers = await this.prisma.router.findMany({});
-      return routers;
+      if (routers.length === 0) {
+        throw new HttpException(
+          "routers does'nt exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+      return { ...routers, message: "fetched all routers" };
     } catch (err) {
       return err;
     }
   }
-  async routerById(domain) {
+  async routerById(domain: string) {
     try {
       const router = await this.prisma.router.findUnique({
         where: {
@@ -81,7 +87,7 @@ export class RouterService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      return router;
+      return { ...router, message: "router fetched successfully" };
     } catch (err) {
       return err;
     }
