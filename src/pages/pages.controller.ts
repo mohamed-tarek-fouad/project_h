@@ -15,14 +15,14 @@ export class PagesController {
     type: "string",
     example: "elganzori",
   })
-  createPage(@Body() createPageDto: CreatePageDto, @Param("id") id: string) {
+  createPage(@Body() createPageDto: CreatePageDto, @Param("id") id: number) {
     return this.pagesService.createPage(createPageDto, id);
   }
 
   @Patch("update/:router/:url/:ex1?/:ex2?/:ex3?/:ex4?/:ex5?/:ex6?")
   updatePage(
     @Body() updatePageDto: UpdatePageDto,
-    @Param("router") router: string,
+    @Param("router") router: number,
     @Param("url") url: string,
     @Param("ex1") ex1: string,
     @Param("ex2") ex2: string,
@@ -45,7 +45,7 @@ export class PagesController {
   }
   @Get(":router/:url/:ex1?/:ex2?/:ex3?/:ex4?/:ex5?/:ex6?")
   pageById(
-    @Param("router") router: string,
+    @Param("router") router: number,
     @Param("url") url: string,
     @Param("ex1") ex1: string,
     @Param("ex2") ex2: string,
@@ -67,7 +67,7 @@ export class PagesController {
   }
   @Delete("delete/:router/:url/:ex1?/:ex2?/:ex3?/:ex4?/:ex5?/:ex6?")
   deletePage(
-    @Param("router") router: string,
+    @Param("router") router: number,
     @Param("url") url: string,
     @Param("ex1") ex1: string,
     @Param("ex2") ex2: string,

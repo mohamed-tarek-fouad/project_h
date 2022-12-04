@@ -9,7 +9,7 @@ import { HttpStatus } from "@nestjs/common";
 @Injectable()
 export class BookingService {
   constructor(private prisma: PrismaService) {}
-  async createBooking(createBookingDto: CreateBookingDto, id: string, req) {
+  async createBooking(createBookingDto: CreateBookingDto, id: number, req) {
     const router = await this.prisma.router.findUnique({
       where: {
         domain: id,
@@ -33,7 +33,7 @@ export class BookingService {
   async updateBooking(
     updateBookingDto: CreateBookingDto,
     id: string,
-    router: string,
+    router: number,
     req,
   ) {
     try {
@@ -74,7 +74,7 @@ export class BookingService {
       return err;
     }
   }
-  async allBookings(routerId: string) {
+  async allBookings(routerId: number) {
     try {
       const bookings = await this.prisma.booking.findMany({
         where: {

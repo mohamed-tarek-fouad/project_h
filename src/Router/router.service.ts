@@ -11,23 +11,12 @@ export class RouterService {
   constructor(private prisma: PrismaService) {}
   async createRouter(createRouterDto: CreateRouterDto, req) {
     try {
-      const routerExists = await this.prisma.router.findUnique({
-        where: {
-          domain: createRouterDto.domain,
-        },
-      });
-      if (routerExists) {
-        throw new HttpException(
-          "this route already exist",
-          HttpStatus.BAD_REQUEST,
-        );
-      }
       const router = await this.prisma.router.create({
         data: createRouterDto,
       });
       await this.prisma.routerAdmin.create({
         data: {
-          routerId: createRouterDto.domain,
+          routerId: router.domain,
           userId: req.user.userId,
         },
       });
@@ -36,7 +25,7 @@ export class RouterService {
       err;
     }
   }
-  async updateRouter(updateRouterDto: UpdateRouterDto, domain: string) {
+  async updateRouter(updateRouterDto: UpdateRouterDto, domain: number) {
     try {
       const routerExist = await this.prisma.router.findUnique({
         where: {
@@ -74,7 +63,7 @@ export class RouterService {
       return err;
     }
   }
-  async routerById(domain: string) {
+  async routerById(domain: number) {
     try {
       const router = await this.prisma.router.findUnique({
         where: {

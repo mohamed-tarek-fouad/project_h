@@ -1,3 +1,4 @@
+import { SpecialitiesModule } from "./specialities/specialities.module";
 import { BookingModule } from "./bookings/booking.module";
 import { VotesModule } from "./votes/votes.module";
 import { PagesModule } from "./pages/pages.module";
@@ -11,6 +12,7 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 @Module({
   imports: [
+    SpecialitiesModule,
     BookingModule,
     VotesModule,
     PagesModule,

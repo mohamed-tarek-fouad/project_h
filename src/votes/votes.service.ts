@@ -9,11 +9,11 @@ import { HttpException } from "@nestjs/common";
 @Injectable()
 export class VotesService {
   constructor(private prisma: PrismaService) {}
-  async createVote(createVoteDto: CreateVoteDto, req) {
+  async createVote(createVoteDto: CreateVoteDto, domain: number, req) {
     try {
       const routeExist = await this.prisma.router.findUnique({
         where: {
-          domain: createVoteDto.voteId,
+          domain,
         },
       });
       if (!routeExist) {
@@ -30,16 +30,13 @@ export class VotesService {
       }
       const vote = await this.prisma.votes.findFirst({
         where: {
-          AND: [{ voteId: createVoteDto.voteId }, { userId: req.user.userId }],
+          AND: [{ voteId: domain }, { userId: req.user.userId }],
         },
       });
       if (vote) {
         const updatedVote = await this.prisma.votes.updateMany({
           where: {
-            AND: [
-              { voteId: createVoteDto.voteId },
-              { userId: req.user.userId },
-            ],
+            AND: [{ voteId: domain }, { userId: req.user.userId }],
           },
           data: {
             ...createVoteDto,
@@ -52,6 +49,7 @@ export class VotesService {
           data: {
             ...createVoteDto,
             userId: parseInt(req.user.userId),
+            voteId: domain,
           },
         });
         return { ...createdVote, message: "vote created successfully" };

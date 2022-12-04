@@ -23,6 +23,9 @@ export class AuthService {
         where: {
           email,
         },
+        include: {
+          routerAdmin: true,
+        },
       });
 
       if (user) {

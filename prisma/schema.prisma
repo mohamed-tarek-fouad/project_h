@@ -11,25 +11,26 @@ datasource db {
 }
 
 model Users {
-  id          Int           @id @default(autoincrement())
-  firstname   String
-  lastname    String
-  email       String        @unique
-  password    String
-  address     String        @default("null")
-  phoneNumber String
-  profilePic  String        @default("null")
-  info        String        @default("null")
-  tokens      tokens[]
-  votes       Votes[]
-  role        UserRole      @default(user)
-  booking     Booking[]
-  routerAdmin RouterAdmin[]
+  id               Int                @id @default(autoincrement())
+  firstname        String
+  lastname         String
+  email            String             @unique
+  password         String
+  address          String             @default("null")
+  phoneNumber      String
+  profilePic       String             @default("null")
+  info             String             @default("null")
+  tokens           tokens[]
+  votes            Votes[]
+  role             UserRole           @default(user)
+  booking          Booking[]
+  routerAdmin      RouterAdmin[]
+  doctorSpeciality doctorSpeciality[]
 }
 
 model Votes {
   id     Int    @id @default(autoincrement())
-  voteId String
+  voteId Int
   userId Int
   user   Users  @relation(fields: [userId], references: [id])
   vote   Router @relation(fields: [voteId], references: [domain])
@@ -44,28 +45,26 @@ model tokens {
 }
 
 model Router {
-  domain        String        @id
-  settings      Json
-  phoneNumber   String        @default("null")
-  whatsapp      String        @default("null")
-  startAt       String        @default("null")
-  endAt         String        @default("null")
-  days          String        @default("all")
-  estimatedTime Int           @default(0)
-  location      String
-  rating        Float         @default(0)
-  voters        Int           @default(0)
-  fees          Float         @default(0)
-  type          Speciality
-  routerAdmin   RouterAdmin[]
-  pages         Pages[]
-  booking       Booking[]
-  votes         Votes[]
+  domain             Int                  @id @default(autoincrement())
+  domainName         String
+  phoneNumber        String               @default("null")
+  whatsapp           String               @default("null")
+  schedual           Json
+  location           String
+  rating             Float                @default(0)
+  voters             Int                  @default(0)
+  fees               Float                @default(0)
+  type               Speciality
+  routerAdmin        RouterAdmin[]
+  pages              Pages[]
+  booking            Booking[]
+  votes              Votes[]
+  routerSpecialities routerSpecialities[]
 }
 
 model RouterAdmin {
   id       Int    @id @default(autoincrement())
-  routerId String
+  routerId Int
   userId   Int
   router   Router @relation(fields: [routerId], references: [domain])
   user     Users  @relation(fields: [userId], references: [id])
@@ -74,7 +73,7 @@ model RouterAdmin {
 model Pages {
   url      String
   page     Json
-  routerId String
+  routerId Int
   router   Router @relation(fields: [routerId], references: [domain])
 
   @@id([url, routerId])
@@ -82,11 +81,33 @@ model Pages {
 
 model Booking {
   id          Int    @id @default(autoincrement())
-  bookingID   String
+  bookingID   Int
   bookingInfo Router @relation(fields: [bookingID], references: [domain])
   userId      Int
   user        Users  @relation(fields: [userId], references: [id])
   details     Json
+}
+
+model Specialities {
+  id                 String               @id
+  doctorSpeciality   doctorSpeciality[]
+  routerSpecialities routerSpecialities[]
+}
+
+model doctorSpeciality {
+  id           Int          @id @default(autoincrement())
+  specialityId String
+  speciality   Specialities @relation(fields: [specialityId], references: [id])
+  doctorId     Int
+  doctor       Users        @relation(fields: [doctorId], references: [id])
+}
+
+model routerSpecialities {
+  id           Int          @id @default(autoincrement())
+  specialityId String
+  speciality   Specialities @relation(fields: [specialityId], references: [id])
+  routerId     Int
+  router       Router       @relation(fields: [routerId], references: [domain])
 }
 
 enum UserRole {

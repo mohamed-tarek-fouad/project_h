@@ -18,7 +18,7 @@ CREATE TABLE `Users` (
 -- CreateTable
 CREATE TABLE `Votes` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `voteId` VARCHAR(191) NOT NULL,
+    `voteId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
     `rate` INTEGER NOT NULL,
 
@@ -36,14 +36,12 @@ CREATE TABLE `tokens` (
 
 -- CreateTable
 CREATE TABLE `Router` (
-    `domain` VARCHAR(191) NOT NULL,
+    `domain` INTEGER NOT NULL AUTO_INCREMENT,
+    `domainName` VARCHAR(191) NOT NULL,
     `settings` JSON NOT NULL,
     `phoneNumber` VARCHAR(191) NOT NULL DEFAULT 'null',
     `whatsapp` VARCHAR(191) NOT NULL DEFAULT 'null',
-    `startAt` VARCHAR(191) NOT NULL DEFAULT 'null',
-    `endAt` VARCHAR(191) NOT NULL DEFAULT 'null',
-    `days` VARCHAR(191) NOT NULL DEFAULT 'all',
-    `estimatedTime` INTEGER NOT NULL DEFAULT 0,
+    `schedual` JSON NOT NULL,
     `location` VARCHAR(191) NOT NULL,
     `rating` DOUBLE NOT NULL DEFAULT 0,
     `voters` INTEGER NOT NULL DEFAULT 0,
@@ -56,7 +54,7 @@ CREATE TABLE `Router` (
 -- CreateTable
 CREATE TABLE `RouterAdmin` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `routerId` VARCHAR(191) NOT NULL,
+    `routerId` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
 
     PRIMARY KEY (`id`)
@@ -66,7 +64,7 @@ CREATE TABLE `RouterAdmin` (
 CREATE TABLE `Pages` (
     `url` VARCHAR(191) NOT NULL,
     `page` JSON NOT NULL,
-    `routerId` VARCHAR(191) NOT NULL,
+    `routerId` INTEGER NOT NULL,
 
     PRIMARY KEY (`url`, `routerId`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -74,7 +72,7 @@ CREATE TABLE `Pages` (
 -- CreateTable
 CREATE TABLE `Booking` (
     `id` INTEGER NOT NULL AUTO_INCREMENT,
-    `bookingID` VARCHAR(191) NOT NULL,
+    `bookingID` INTEGER NOT NULL,
     `userId` INTEGER NOT NULL,
     `details` JSON NOT NULL,
 

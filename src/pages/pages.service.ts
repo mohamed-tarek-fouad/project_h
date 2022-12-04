@@ -10,7 +10,7 @@ import { Concat } from "./nestedPagesConcat";
 @Injectable()
 export class PagesService {
   constructor(private prisma: PrismaService, private concat: Concat) {}
-  async createPage(createPageDto: CreatePageDto, id: string) {
+  async createPage(createPageDto: CreatePageDto, id: number) {
     try {
       const pageExist = await this.prisma.pages.findFirst({
         where: {
@@ -44,14 +44,14 @@ export class PagesService {
   }
   async updatePage(
     updatePageDto: UpdatePageDto,
-    router,
-    url,
-    ex1,
-    ex2,
-    ex3,
-    ex4,
-    ex5,
-    ex6,
+    router: number,
+    url: string,
+    ex1: string,
+    ex2: string,
+    ex3: string,
+    ex4: string,
+    ex5: string,
+    ex6: string,
   ): Promise<any> {
     try {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
@@ -90,7 +90,16 @@ export class PagesService {
       return err;
     }
   }
-  async pageById(router, url, ex1, ex2, ex3, ex4, ex5, ex6) {
+  async pageById(
+    router: number,
+    url: string,
+    ex1: string,
+    ex2: string,
+    ex3: string,
+    ex4: string,
+    ex5: string,
+    ex6: string,
+  ) {
     try {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
       const page = await this.prisma.pages.findFirst({
@@ -109,7 +118,16 @@ export class PagesService {
       return err;
     }
   }
-  async deletePage(router, url, ex1, ex2, ex3, ex4, ex5, ex6) {
+  async deletePage(
+    router: number,
+    url: string,
+    ex1: string,
+    ex2: string,
+    ex3: string,
+    ex4: string,
+    ex5: string,
+    ex6: string,
+  ) {
     try {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
       const page = await this.prisma.pages.findFirst({
