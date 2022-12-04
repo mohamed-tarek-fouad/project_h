@@ -53,8 +53,17 @@ export class UsersService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      delete user.password;
-      return { ...user, message: "user fetched successfully" };
+      const routerAdmin = user.routerAdmin.map((d) => {
+        return {
+          domain: d.router.domain,
+          domainName: d.router.domainName,
+          rating: d.router.rating,
+          voters: d.router.voters,
+          type: d.router.type,
+        };
+      });
+      delete user.routerAdmin;
+      return { ...user, routerAdmin, message: "user fetched successfully" };
     } catch (err) {
       return err;
     }
