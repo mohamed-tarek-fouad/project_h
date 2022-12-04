@@ -53,6 +53,7 @@ model Router {
   settings           Json
   location           String
   rating             Float                @default(0)
+  totalRating        Int                  @default(0)
   voters             Int                  @default(0)
   fees               Float                @default(0)
   type               Speciality

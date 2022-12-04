@@ -40,7 +40,21 @@ export class VotesService {
           },
           data: {
             ...createVoteDto,
-            userId: parseInt(req.user.userId),
+          },
+        });
+
+        const totalRating =
+          (routeExist.totalRating * routeExist.rating -
+            createVoteDto.rate +
+            createVoteDto.rate) /
+          (routeExist.rating - createVoteDto.rate + 1);
+        await this.prisma.router.update({
+          where: {
+            domain,
+          },
+          data: {
+            rating: routeExist.rating - createVoteDto.rate,
+            totalRating,
           },
         });
         return { ...updatedVote, message: "vote updated successfully" };
@@ -50,6 +64,20 @@ export class VotesService {
             ...createVoteDto,
             userId: parseInt(req.user.userId),
             voteId: domain,
+          },
+        });
+
+        const totalRating =
+          (routeExist.totalRating * routeExist.rating + createVoteDto.rate) /
+          (routeExist.rating + 1);
+        await this.prisma.router.update({
+          where: {
+            domain,
+          },
+          data: {
+            totalRating,
+            voters: routeExist.voters + 1,
+            rating: routeExist.rating + createVoteDto.rate,
           },
         });
         return { ...createdVote, message: "vote created successfully" };
