@@ -40,4 +40,8 @@ export class SpecialitiesController {
   allDoctors(@Query("speciality") speciality?: string) {
     return this.specialitiesService.allDoctors(speciality);
   }
+  @Get("router")
+  allRoutersSpecility(@Query("speciality") speciality?: string) {
+    return this.specialitiesService.allRoutersSpeciality(speciality);
+  }
 }

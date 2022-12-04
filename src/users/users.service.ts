@@ -42,6 +42,9 @@ export class UsersService {
         where: {
           id: parseInt(id),
         },
+        include: {
+          routerAdmin: true,
+        },
       });
       if (!user) {
         throw new HttpException(

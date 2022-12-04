@@ -92,4 +92,21 @@ export class SpecialitiesService {
       return err;
     }
   }
+  async allRoutersSpeciality(speciality: string) {
+    try {
+      if (speciality) {
+        const routers = await this.prisma.routerSpecialities.findMany({
+          where: {
+            specialityId: speciality,
+          },
+        });
+        return { ...routers, message: "fetched all routers successfully" };
+      } else {
+        const routers = await this.prisma.routerSpecialities.findMany({});
+        return { ...routers, message: "fetched all routers successfully" };
+      }
+    } catch (err) {
+      return err;
+    }
+  }
 }
