@@ -1,9 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger/dist/decorators";
-import { IsOptional } from "class-validator";
+import { IsNotEmpty, IsOptional } from "class-validator";
 
 export class UpdateRouterDto {
   @ApiProperty({ example: "mawlana" })
+  @IsNotEmpty()
   @IsOptional()
   domainName: string;
   @ApiProperty({ example: { test: "test" } })

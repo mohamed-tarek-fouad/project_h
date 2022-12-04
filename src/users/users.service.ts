@@ -10,7 +10,7 @@ export class UsersService {
       if (user.length === 0) {
         throw new HttpException("user does'nt exist", HttpStatus.BAD_REQUEST);
       }
-      return { ...user, message: "fetched all users successfully" };
+      return { message: "fetched all users successfully" };
     } catch (err) {
       return err;
     }
@@ -31,6 +31,7 @@ export class UsersService {
         where: { id },
         data: updateUserDto,
       });
+      delete updatedUser.password;
       return { ...updatedUser, message: "user updated successfully" };
     } catch (err) {
       return err;
@@ -43,7 +44,7 @@ export class UsersService {
           id: parseInt(id),
         },
         include: {
-          routerAdmin: true,
+          routerAdmin: { select: { router: true } },
         },
       });
       if (!user) {
@@ -52,7 +53,8 @@ export class UsersService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      return user;
+      delete user.password;
+      return { ...user, message: "user fetched successfully" };
     } catch (err) {
       return err;
     }
