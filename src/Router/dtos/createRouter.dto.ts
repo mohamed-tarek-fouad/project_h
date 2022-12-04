@@ -14,7 +14,7 @@ export class CreateRouterDto {
   whatsapp: string;
   @ApiProperty()
   @IsOptional()
-  schedual: object;
+  schedule: object;
   @ApiProperty({ example: "fayoum" })
   location: string;
   @ApiProperty({ example: 300 })

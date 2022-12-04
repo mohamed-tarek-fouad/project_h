@@ -178,6 +178,7 @@ export class AuthService {
           password: resetPasswordDto.password,
         },
       });
+      delete user.password
       return { ...user, message: "reset password successfully" };
     } catch (err) {
       return err;

@@ -11,6 +11,9 @@ export class RouterService {
   constructor(private prisma: PrismaService) {}
   async createRouter(createRouterDto: CreateRouterDto, req) {
     try {
+      if (!createRouterDto.schedule) {
+        createRouterDto.schedule = { smth: "smth" };
+      }
       const router = await this.prisma.router.create({
         data: createRouterDto,
       });
