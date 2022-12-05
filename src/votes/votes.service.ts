@@ -9,11 +9,11 @@ import { HttpException } from "@nestjs/common";
 @Injectable()
 export class VotesService {
   constructor(private prisma: PrismaService) {}
-  async createVote(createVoteDto: CreateVoteDto, domain: number, req) {
+  async createVote(createVoteDto: CreateVoteDto, domain: string, req) {
     try {
       const routeExist = await this.prisma.router.findUnique({
         where: {
-          domain,
+          domain: parseInt(domain),
         },
       });
       if (!routeExist) {
@@ -30,13 +30,13 @@ export class VotesService {
       }
       const vote = await this.prisma.votes.findFirst({
         where: {
-          AND: [{ voteId: domain }, { userId: req.user.userId }],
+          AND: [{ voteId: parseInt(domain) }, { userId: req.user.userId }],
         },
       });
       if (vote) {
         const updatedVote = await this.prisma.votes.updateMany({
           where: {
-            AND: [{ voteId: domain }, { userId: req.user.userId }],
+            AND: [{ voteId: parseInt(domain) }, { userId: req.user.userId }],
           },
           data: {
             ...createVoteDto,
@@ -44,13 +44,11 @@ export class VotesService {
         });
 
         const totalRating =
-          (routeExist.totalRating * routeExist.rating -
-            createVoteDto.rate +
-            createVoteDto.rate) /
-          (routeExist.rating - createVoteDto.rate + 1);
+          (routeExist.totalRating * routeExist.rating + createVoteDto.rate) /
+          (routeExist.rating + 1);
         await this.prisma.router.update({
           where: {
-            domain,
+            domain: parseInt(domain),
           },
           data: {
             rating: routeExist.rating - createVoteDto.rate,
@@ -63,7 +61,7 @@ export class VotesService {
           data: {
             ...createVoteDto,
             userId: parseInt(req.user.userId),
-            voteId: domain,
+            voteId: parseInt(domain),
           },
         });
 
@@ -72,7 +70,7 @@ export class VotesService {
           (routeExist.rating + 1);
         await this.prisma.router.update({
           where: {
-            domain,
+            domain: parseInt(domain),
           },
           data: {
             totalRating,

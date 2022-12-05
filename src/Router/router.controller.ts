@@ -27,7 +27,7 @@ export class RouterController {
   @Patch("update/:domain")
   updateRouter(
     @Body() updateRouterDto: UpdateRouterDto,
-    @Param("domain") domain: number,
+    @Param("domain") domain: string,
   ) {
     return this.routerService.updateRouter(updateRouterDto, domain);
   }
@@ -36,7 +36,7 @@ export class RouterController {
     return this.routerService.allRouters();
   }
   @Get(":domain")
-  routerbyId(@Param("domain") domain: number) {
+  routerbyId(@Param("domain") domain: string) {
     return this.routerService.routerById(domain);
   }
 }

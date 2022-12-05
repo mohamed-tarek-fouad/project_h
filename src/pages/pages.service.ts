@@ -10,11 +10,11 @@ import { Concat } from "./nestedPagesConcat";
 @Injectable()
 export class PagesService {
   constructor(private prisma: PrismaService, private concat: Concat) {}
-  async createPage(createPageDto: CreatePageDto, id: number) {
+  async createPage(createPageDto: CreatePageDto, id: string) {
     try {
       const pageExist = await this.prisma.pages.findFirst({
         where: {
-          AND: [{ routerId: id }, { url: createPageDto.url }],
+          AND: [{ routerId: parseInt(id) }, { url: createPageDto.url }],
         },
       });
       if (pageExist) {
@@ -25,7 +25,7 @@ export class PagesService {
       }
       const routerExist = await this.prisma.router.findUnique({
         where: {
-          domain: id,
+          domain: parseInt(id),
         },
       });
       if (!routerExist) {
@@ -35,7 +35,7 @@ export class PagesService {
         );
       }
       const page = await this.prisma.pages.create({
-        data: { ...createPageDto, routerId: id },
+        data: { ...createPageDto, routerId: parseInt(id) },
       });
       return { ...page, message: "page created successfully" };
     } catch (err) {
@@ -44,7 +44,7 @@ export class PagesService {
   }
   async updatePage(
     updatePageDto: UpdatePageDto,
-    router: number,
+    router: string,
     url: string,
     ex1: string,
     ex2: string,
@@ -58,7 +58,7 @@ export class PagesService {
 
       const pageExist = await this.prisma.pages.findFirst({
         where: {
-          AND: [{ routerId: router }, { url }],
+          AND: [{ routerId: parseInt(router) }, { url }],
         },
       });
       if (!pageExist) {
@@ -69,7 +69,7 @@ export class PagesService {
       }
       const conflictPages = await this.prisma.pages.findFirst({
         where: {
-          AND: [{ routerId: router }, { url: updatePageDto.url }],
+          AND: [{ routerId: parseInt(router) }, { url: updatePageDto.url }],
         },
       });
       if (conflictPages) {
@@ -80,7 +80,7 @@ export class PagesService {
       }
       await this.prisma.pages.updateMany({
         where: {
-          AND: [{ routerId: router }, { url }],
+          AND: [{ routerId: parseInt(router) }, { url }],
         },
         data: updatePageDto,
       });
@@ -91,7 +91,7 @@ export class PagesService {
     }
   }
   async pageById(
-    router: number,
+    router: string,
     url: string,
     ex1: string,
     ex2: string,
@@ -104,7 +104,7 @@ export class PagesService {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
       const page = await this.prisma.pages.findFirst({
         where: {
-          AND: [{ routerId: router }, { url }],
+          AND: [{ routerId: parseInt(router) }, { url }],
         },
       });
       if (!page) {
@@ -119,7 +119,7 @@ export class PagesService {
     }
   }
   async deletePage(
-    router: number,
+    router: string,
     url: string,
     ex1: string,
     ex2: string,
@@ -132,7 +132,7 @@ export class PagesService {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
       const page = await this.prisma.pages.findFirst({
         where: {
-          AND: [{ routerId: router }, { url }],
+          AND: [{ routerId: parseInt(router) }, { url }],
         },
       });
       if (!page) {
@@ -143,7 +143,7 @@ export class PagesService {
       }
       await this.prisma.pages.deleteMany({
         where: {
-          AND: [{ routerId: router }, { url }],
+          AND: [{ routerId: parseInt(router) }, { url }],
         },
       });
       return { message: "page delted successfully" };

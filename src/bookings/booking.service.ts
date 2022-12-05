@@ -9,10 +9,10 @@ import { HttpStatus } from "@nestjs/common";
 @Injectable()
 export class BookingService {
   constructor(private prisma: PrismaService) {}
-  async createBooking(createBookingDto: CreateBookingDto, id: number, req) {
+  async createBooking(createBookingDto: CreateBookingDto, id: string, req) {
     const router = await this.prisma.router.findUnique({
       where: {
-        domain: id,
+        domain: parseInt(id),
       },
     });
     if (!router) {
@@ -23,7 +23,11 @@ export class BookingService {
     }
     try {
       const booking = await this.prisma.booking.create({
-        data: { ...createBookingDto, bookingID: id, userId: req.user.userId },
+        data: {
+          ...createBookingDto,
+          bookingID: parseInt(id),
+          userId: req.user.userId,
+        },
       });
       return { ...booking, message: "booking created successfully" };
     } catch (err) {
@@ -33,7 +37,7 @@ export class BookingService {
   async updateBooking(
     updateBookingDto: CreateBookingDto,
     id: string,
-    router: number,
+    router: string,
     req,
   ) {
     try {
@@ -50,7 +54,7 @@ export class BookingService {
       }
       const routerExist = await this.prisma.router.findUnique({
         where: {
-          domain: router,
+          domain: parseInt(router),
         },
       });
       if (!routerExist) {
@@ -66,7 +70,6 @@ export class BookingService {
         data: {
           ...updateBookingDto,
           userId: req.user.userId,
-          bookingID: router,
         },
       });
       return { ...booking, message: "booking updated successfully" };
@@ -74,11 +77,11 @@ export class BookingService {
       return err;
     }
   }
-  async allBookings(routerId: number) {
+  async allBookings(routerId: string) {
     try {
       const bookings = await this.prisma.booking.findMany({
         where: {
-          bookingID: routerId,
+          bookingID: parseInt(routerId),
         },
       });
       if (bookings.length === 0) {

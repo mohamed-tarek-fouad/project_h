@@ -12,7 +12,7 @@ export class VotesController {
   @Post(":domain")
   createVote(
     @Body() voteDto: CreateVoteDto,
-    @Param("domain") domain: number,
+    @Param("domain") domain: string,
     @Req() req,
   ) {
     return this.votesService.createVote(voteDto, domain, req);

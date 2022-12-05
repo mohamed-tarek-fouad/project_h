@@ -21,7 +21,7 @@ export class BookingController {
   @UseGuards(JwtAuthGuard)
   createBooking(
     @Body() createBookingDto: CreateBookingDto,
-    @Param("id") id: number,
+    @Param("id") id: string,
     @Req() req,
   ) {
     return this.bookingService.createBooking(createBookingDto, id, req);
@@ -31,13 +31,13 @@ export class BookingController {
   updateBooking(
     @Body() updateBookingDto: CreateBookingDto,
     @Param("id") id: string,
-    @Param("router") router: number,
+    @Param("router") router: string,
     @Req() req,
   ) {
     return this.bookingService.updateBooking(updateBookingDto, id, router, req);
   }
   @Get("all/:router")
-  allBookings(@Param("router") router: number) {
+  allBookings(@Param("router") router: string) {
     return this.bookingService.allBookings(router);
   }
   @Get(":id")

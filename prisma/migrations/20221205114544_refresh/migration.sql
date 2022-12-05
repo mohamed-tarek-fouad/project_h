@@ -38,12 +38,13 @@ CREATE TABLE `tokens` (
 CREATE TABLE `Router` (
     `domain` INTEGER NOT NULL AUTO_INCREMENT,
     `domainName` VARCHAR(191) NOT NULL,
-    `settings` JSON NOT NULL,
     `phoneNumber` VARCHAR(191) NOT NULL DEFAULT 'null',
     `whatsapp` VARCHAR(191) NOT NULL DEFAULT 'null',
-    `schedual` JSON NOT NULL,
+    `schedule` JSON NOT NULL,
+    `settings` JSON NOT NULL,
     `location` VARCHAR(191) NOT NULL,
     `rating` DOUBLE NOT NULL DEFAULT 0,
+    `totalRating` INTEGER NOT NULL DEFAULT 0,
     `voters` INTEGER NOT NULL DEFAULT 0,
     `fees` DOUBLE NOT NULL DEFAULT 0,
     `type` ENUM('hospital', 'clinic', 'lab') NOT NULL,
@@ -79,6 +80,31 @@ CREATE TABLE `Booking` (
     PRIMARY KEY (`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
+-- CreateTable
+CREATE TABLE `Specialities` (
+    `id` VARCHAR(191) NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `doctorSpeciality` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `specialityId` VARCHAR(191) NOT NULL,
+    `doctorId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- CreateTable
+CREATE TABLE `routerSpecialities` (
+    `id` INTEGER NOT NULL AUTO_INCREMENT,
+    `specialityId` VARCHAR(191) NOT NULL,
+    `routerId` INTEGER NOT NULL,
+
+    PRIMARY KEY (`id`)
+) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
 -- AddForeignKey
 ALTER TABLE `Votes` ADD CONSTRAINT `Votes_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
@@ -102,3 +128,15 @@ ALTER TABLE `Booking` ADD CONSTRAINT `Booking_bookingID_fkey` FOREIGN KEY (`book
 
 -- AddForeignKey
 ALTER TABLE `Booking` ADD CONSTRAINT `Booking_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `doctorSpeciality` ADD CONSTRAINT `doctorSpeciality_specialityId_fkey` FOREIGN KEY (`specialityId`) REFERENCES `Specialities`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `doctorSpeciality` ADD CONSTRAINT `doctorSpeciality_doctorId_fkey` FOREIGN KEY (`doctorId`) REFERENCES `Users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `routerSpecialities` ADD CONSTRAINT `routerSpecialities_specialityId_fkey` FOREIGN KEY (`specialityId`) REFERENCES `Specialities`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE `routerSpecialities` ADD CONSTRAINT `routerSpecialities_routerId_fkey` FOREIGN KEY (`routerId`) REFERENCES `Router`(`domain`) ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -17,6 +17,7 @@ export class RouterService {
       const router = await this.prisma.router.create({
         data: createRouterDto,
       });
+      console.log(router);
       await this.prisma.routerAdmin.create({
         data: {
           routerId: router.domain,
@@ -28,11 +29,11 @@ export class RouterService {
       err;
     }
   }
-  async updateRouter(updateRouterDto: UpdateRouterDto, domain: number) {
+  async updateRouter(updateRouterDto: UpdateRouterDto, domain: string) {
     try {
       const routerExist = await this.prisma.router.findUnique({
         where: {
-          domain,
+          domain: parseInt(domain),
         },
       });
       if (!routerExist) {
@@ -43,7 +44,7 @@ export class RouterService {
       }
       const updatedRoute = await this.prisma.router.update({
         where: {
-          domain,
+          domain: parseInt(domain),
         },
         data: updateRouterDto,
       });
@@ -66,20 +67,20 @@ export class RouterService {
       return err;
     }
   }
-  async routerById(domain: number) {
+  async routerById(domain: string) {
     try {
-      const router = await this.prisma.router.findUnique({
-        where: {
-          domain,
-        },
+      console.log(domain);
+      const route = await this.prisma.router.findUnique({
+        where: { domain: parseInt(domain) },
       });
-      if (!router) {
+      if (!route) {
         throw new HttpException(
           "this route does'nt exist",
           HttpStatus.BAD_REQUEST,
         );
       }
-      return { ...router, message: "router fetched successfully" };
+
+      return { ...route, message: "router fetched successfully" };
     } catch (err) {
       return err;
     }
