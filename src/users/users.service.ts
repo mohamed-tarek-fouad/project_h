@@ -16,7 +16,7 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: number, updateUserDto: UpdateUserDto) {
+  async updateUser(id: string, updateUserDto: UpdateUserDto) {
     try {
       const user = await this.prisma.users.findUnique({
         where: {
@@ -41,7 +41,7 @@ export class UsersService {
     try {
       const user = await this.prisma.users.findUnique({
         where: {
-          id: parseInt(id),
+          id,
         },
         include: {
           routerAdmin: { select: { router: true } },

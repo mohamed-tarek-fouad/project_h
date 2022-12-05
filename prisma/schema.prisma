@@ -6,12 +6,124 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
+// model Users {
+//   id               Int                @id @default(autoincrement())
+//   firstname        String
+//   lastname         String
+//   email            String             @unique
+//   password         String
+//   address          String             @default("null")
+//   phoneNumber      String
+//   profilePic       String             @default("null")
+//   info             String             @default("null")
+//   tokens           tokens[]
+//   votes            Votes[]
+//   role             UserRole           @default(user)
+//   booking          Booking[]
+//   routerAdmin      RouterAdmin[]
+//   doctorSpeciality doctorSpeciality[]
+// }
+
+// model Votes {
+//   id     Int    @id @default(autoincrement())
+//   voteId Int
+//   userId Int
+//   user   Users  @relation(fields: [userId], references: [id])
+//   vote   Router @relation(fields: [voteId], references: [domain])
+//   rate   Int
+// }
+
+// model tokens {
+//   id        Int      @id @default(autoincrement())
+//   userId    Int
+//   expiresAt DateTime
+//   user      Users    @relation(fields: [userId], references: [id])
+// }
+
+// model Router {
+//   domain             Int                  @id @default(autoincrement())
+//   domainName         String
+//   phoneNumber        String               @default("null")
+//   whatsapp           String               @default("null")
+//   schedule           Json
+//   settings           Json
+//   location           String
+//   rating             Float                @default(0)
+//   totalRating        Int                  @default(0)
+//   voters             Int                  @default(0)
+//   fees               Float                @default(0)
+//   type               Speciality
+//   routerAdmin        RouterAdmin[]
+//   pages              Pages[]
+//   booking            Booking[]
+//   votes              Votes[]
+//   routerSpecialities routerSpecialities[]
+// }
+
+// model RouterAdmin {
+//   id       Int    @id @default(autoincrement())
+//   routerId Int
+//   userId   Int
+//   router   Router @relation(fields: [routerId], references: [domain])
+//   user     Users  @relation(fields: [userId], references: [id])
+// }
+
+// model Pages {
+//   url      String
+//   page     Json
+//   routerId Int
+//   router   Router @relation(fields: [routerId], references: [domain])
+
+//   @@id([url, routerId])
+// }
+
+// model Booking {
+//   id          Int    @id @default(autoincrement())
+//   bookingID   Int
+//   bookingInfo Router @relation(fields: [bookingID], references: [domain])
+//   userId      Int
+//   user        Users  @relation(fields: [userId], references: [id])
+//   details     Json
+// }
+
+// model Specialities {
+//   id                 String               @id
+//   doctorSpeciality   doctorSpeciality[]
+//   routerSpecialities routerSpecialities[]
+// }
+
+// model doctorSpeciality {
+//   id           Int          @id @default(autoincrement())
+//   specialityId String
+//   speciality   Specialities @relation(fields: [specialityId], references: [id])
+//   doctorId     Int
+//   doctor       Users        @relation(fields: [doctorId], references: [id])
+// }
+
+// model routerSpecialities {
+//   id           Int          @id @default(autoincrement())
+//   specialityId String
+//   speciality   Specialities @relation(fields: [specialityId], references: [id])
+//   routerId     Int
+//   router       Router       @relation(fields: [routerId], references: [domain])
+// }
+
+// enum UserRole {
+//   user
+//   admin
+// }
+
+// enum Speciality {
+//   hospital
+//   clinic
+//   lab
+// }
 model Users {
-  id               Int                @id @default(autoincrement())
+  id               String             @id @default(auto()) @map("_id") @db.ObjectId
   firstname        String
   lastname         String
   email            String             @unique
@@ -29,28 +141,28 @@ model Users {
 }
 
 model Votes {
-  id     Int    @id @default(autoincrement())
-  voteId Int
-  userId Int
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  voteId String
+  userId String
   user   Users  @relation(fields: [userId], references: [id])
   vote   Router @relation(fields: [voteId], references: [domain])
   rate   Int
 }
 
 model tokens {
-  id        Int      @id @default(autoincrement())
-  userId    Int
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId    String
   expiresAt DateTime
   user      Users    @relation(fields: [userId], references: [id])
 }
 
 model Router {
-  domain             Int                  @id @default(autoincrement())
+  domain             String               @id @default(auto()) @map("_id") @db.ObjectId
   domainName         String
   phoneNumber        String               @default("null")
   whatsapp           String               @default("null")
-  schedule           Json
-  settings           Json
+  schedule           Schedule
+  settings           Settings
   location           String
   rating             Float                @default(0)
   totalRating        Int                  @default(0)
@@ -64,51 +176,63 @@ model Router {
   routerSpecialities routerSpecialities[]
 }
 
+type Schedule {
+  startAt       DateTime
+  endAt         DateTime
+  days          String[]
+  estimatedTime Int
+}
+
+type Settings {
+  themes String
+}
+
 model RouterAdmin {
-  id       Int    @id @default(autoincrement())
-  routerId Int
-  userId   Int
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  routerId String
+  userId   String
   router   Router @relation(fields: [routerId], references: [domain])
   user     Users  @relation(fields: [userId], references: [id])
 }
 
 model Pages {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
   url      String
   page     Json
-  routerId Int
+  routerId String
   router   Router @relation(fields: [routerId], references: [domain])
 
-  @@id([url, routerId])
+  @@unique([url, routerId])
 }
 
 model Booking {
-  id          Int    @id @default(autoincrement())
-  bookingID   Int
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  bookingID   String
   bookingInfo Router @relation(fields: [bookingID], references: [domain])
-  userId      Int
+  userId      String
   user        Users  @relation(fields: [userId], references: [id])
   details     Json
 }
 
 model Specialities {
-  id                 String               @id
+  id                 String               @id @map("_id")
   doctorSpeciality   doctorSpeciality[]
   routerSpecialities routerSpecialities[]
 }
 
 model doctorSpeciality {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   specialityId String
   speciality   Specialities @relation(fields: [specialityId], references: [id])
-  doctorId     Int
+  doctorId     String
   doctor       Users        @relation(fields: [doctorId], references: [id])
 }
 
 model routerSpecialities {
-  id           Int          @id @default(autoincrement())
+  id           String       @id @default(auto()) @map("_id") @db.ObjectId
   specialityId String
   speciality   Specialities @relation(fields: [specialityId], references: [id])
-  routerId     Int
+  routerId     String
   router       Router       @relation(fields: [routerId], references: [domain])
 }
 

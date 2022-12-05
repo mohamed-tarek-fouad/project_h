@@ -5,7 +5,7 @@ export class CreateRouterDto {
   @ApiProperty({ example: "mawlana" })
   @IsNotEmpty()
   domainName: string;
-  @ApiProperty({ example: { test: "test" } })
+  @ApiProperty()
   settings: any;
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
@@ -15,7 +15,7 @@ export class CreateRouterDto {
   whatsapp: string;
   @ApiProperty()
   @IsOptional()
-  schedule: object;
+  schedule: any;
   @ApiProperty({ example: "fayoum" })
   location: string;
   @ApiProperty({ example: 300 })

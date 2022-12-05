@@ -10,22 +10,23 @@ import { HttpStatus } from "@nestjs/common";
 export class BookingService {
   constructor(private prisma: PrismaService) {}
   async createBooking(createBookingDto: CreateBookingDto, id: string, req) {
-    const router = await this.prisma.router.findUnique({
-      where: {
-        domain: parseInt(id),
-      },
-    });
-    if (!router) {
-      throw new HttpException(
-        "this router doesn't exist",
-        HttpStatus.BAD_REQUEST,
-      );
-    }
     try {
+      const router = await this.prisma.router.findUnique({
+        where: {
+          domain: id,
+        },
+      });
+
+      if (!router) {
+        throw new HttpException(
+          "this router doesn't exist",
+          HttpStatus.BAD_REQUEST,
+        );
+      }
       const booking = await this.prisma.booking.create({
         data: {
           ...createBookingDto,
-          bookingID: parseInt(id),
+          bookingID: id,
           userId: req.user.userId,
         },
       });
@@ -43,7 +44,7 @@ export class BookingService {
     try {
       const bookingExist = await this.prisma.booking.findUnique({
         where: {
-          id: parseInt(id),
+          id,
         },
       });
       if (!bookingExist) {
@@ -54,7 +55,7 @@ export class BookingService {
       }
       const routerExist = await this.prisma.router.findUnique({
         where: {
-          domain: parseInt(router),
+          domain: router,
         },
       });
       if (!routerExist) {
@@ -65,7 +66,7 @@ export class BookingService {
       }
       const booking = await this.prisma.booking.update({
         where: {
-          id: parseInt(id),
+          id,
         },
         data: {
           ...updateBookingDto,
@@ -81,7 +82,7 @@ export class BookingService {
     try {
       const bookings = await this.prisma.booking.findMany({
         where: {
-          bookingID: parseInt(routerId),
+          bookingID: routerId,
         },
       });
       if (bookings.length === 0) {
@@ -99,7 +100,7 @@ export class BookingService {
     try {
       const booking = await this.prisma.booking.findUnique({
         where: {
-          id: parseInt(id),
+          id,
         },
       });
       if (!booking) {
@@ -117,7 +118,7 @@ export class BookingService {
     try {
       const booking = await this.prisma.booking.findUnique({
         where: {
-          id: parseInt(id),
+          id,
         },
       });
       if (!booking) {
@@ -128,7 +129,7 @@ export class BookingService {
       }
       await this.prisma.booking.delete({
         where: {
-          id: parseInt(id),
+          id,
         },
       });
       return { message: "booking canceled" };

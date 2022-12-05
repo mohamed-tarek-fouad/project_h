@@ -36,7 +36,7 @@ export class AuthService {
       return err;
     }
   }
-  async validateToken(id: number) {
+  async validateToken(id: string) {
     try {
       const token = await this.prisma.tokens.findUnique({
         where: {
@@ -156,7 +156,7 @@ export class AuthService {
     try {
       const validateUser = await this.prisma.users.findUnique({
         where: {
-          id: parseInt(id),
+          id,
         },
       });
       if (!validateUser) {
@@ -173,12 +173,12 @@ export class AuthService {
         saltOrRounds,
       );
       const user = await this.prisma.users.update({
-        where: { id: parseInt(id) },
+        where: { id },
         data: {
           password: resetPasswordDto.password,
         },
       });
-      delete user.password
+      delete user.password;
       return { ...user, message: "reset password successfully" };
     } catch (err) {
       return err;

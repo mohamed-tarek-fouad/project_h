@@ -17,7 +17,6 @@ export class RouterService {
       const router = await this.prisma.router.create({
         data: createRouterDto,
       });
-      console.log(router);
       await this.prisma.routerAdmin.create({
         data: {
           routerId: router.domain,
@@ -33,7 +32,7 @@ export class RouterService {
     try {
       const routerExist = await this.prisma.router.findUnique({
         where: {
-          domain: parseInt(domain),
+          domain,
         },
       });
       if (!routerExist) {
@@ -44,7 +43,7 @@ export class RouterService {
       }
       const updatedRoute = await this.prisma.router.update({
         where: {
-          domain: parseInt(domain),
+          domain,
         },
         data: updateRouterDto,
       });
@@ -69,9 +68,8 @@ export class RouterService {
   }
   async routerById(domain: string) {
     try {
-      console.log(domain);
       const route = await this.prisma.router.findUnique({
-        where: { domain: parseInt(domain) },
+        where: { domain },
       });
       if (!route) {
         throw new HttpException(

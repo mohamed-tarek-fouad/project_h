@@ -13,7 +13,7 @@ export class VotesService {
     try {
       const routeExist = await this.prisma.router.findUnique({
         where: {
-          domain: parseInt(domain),
+          domain,
         },
       });
       if (!routeExist) {
@@ -30,13 +30,13 @@ export class VotesService {
       }
       const vote = await this.prisma.votes.findFirst({
         where: {
-          AND: [{ voteId: parseInt(domain) }, { userId: req.user.userId }],
+          AND: [{ voteId: domain }, { userId: req.user.userId }],
         },
       });
       if (vote) {
         const updatedVote = await this.prisma.votes.updateMany({
           where: {
-            AND: [{ voteId: parseInt(domain) }, { userId: req.user.userId }],
+            AND: [{ voteId: domain }, { userId: req.user.userId }],
           },
           data: {
             ...createVoteDto,
@@ -48,7 +48,7 @@ export class VotesService {
           (routeExist.rating + 1);
         await this.prisma.router.update({
           where: {
-            domain: parseInt(domain),
+            domain,
           },
           data: {
             rating: routeExist.rating - createVoteDto.rate,
@@ -60,8 +60,8 @@ export class VotesService {
         const createdVote = await this.prisma.votes.create({
           data: {
             ...createVoteDto,
-            userId: parseInt(req.user.userId),
-            voteId: parseInt(domain),
+            userId: req.user.userId,
+            voteId: domain,
           },
         });
 
@@ -70,7 +70,7 @@ export class VotesService {
           (routeExist.rating + 1);
         await this.prisma.router.update({
           where: {
-            domain: parseInt(domain),
+            domain,
           },
           data: {
             totalRating,
