@@ -174,8 +174,6 @@ model Router {
   booking            Booking[]
   votes              Votes[]
   routerSpecialities routerSpecialities[]
-
-  @@unique([domainName, type])
 }
 
 type Schedule {

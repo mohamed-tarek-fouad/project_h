@@ -2,9 +2,9 @@
 import { Injectable } from "@nestjs/common";
 import { CreateRouterDto } from "./dtos/createRouter.dto";
 import { PrismaService } from "./../prisma.service";
-import { HttpException } from "@nestjs/common";
-import { HttpStatus } from "@nestjs/common";
 import { UpdateRouterDto } from "./dtos/updateRouter.dto";
+import { HttpStatus } from "@nestjs/common";
+import { HttpException } from "@nestjs/common";
 
 @Injectable()
 export class RouterService {
@@ -13,6 +13,20 @@ export class RouterService {
     try {
       if (!createRouterDto.schedule) {
         createRouterDto.schedule = { smth: "smth" };
+      }
+      const routerExist = await this.prisma.router.findFirst({
+        where: {
+          AND: [
+            { domainName: createRouterDto.domainName },
+            { type: createRouterDto.type },
+          ],
+        },
+      });
+      if (routerExist) {
+        return {
+          message: "route already exist",
+          status: HttpStatus.BAD_REQUEST,
+        };
       }
       const router = await this.prisma.router.create({
         data: createRouterDto,
@@ -36,10 +50,7 @@ export class RouterService {
         },
       });
       if (!routerExist) {
-        throw new HttpException(
-          "this route does'nt exist",
-          HttpStatus.BAD_REQUEST,
-        );
+        throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
       const updatedRoute = await this.prisma.router.update({
         where: {
@@ -66,9 +77,13 @@ export class RouterService {
             domainName: { contains: searsh },
           },
         });
-        if (!routers) {
-          throw new HttpException("no routers exist", HttpStatus.BAD_REQUEST);
+        if (routers.length === 0) {
+          throw new HttpException(
+            "router doesn't exist",
+            HttpStatus.BAD_REQUEST,
+          );
         }
+
         return { ...routers, message: "fetched all routers" };
       } else {
         const routers = await this.prisma.router.findMany({
@@ -77,8 +92,11 @@ export class RouterService {
             domainName: { contains: searsh },
           },
         });
-        if (!routers) {
-          throw new HttpException("no routers exist", HttpStatus.BAD_REQUEST);
+        if (routers.length === 0) {
+          throw new HttpException(
+            "router doesn't exist",
+            HttpStatus.BAD_REQUEST,
+          );
         }
         return { ...routers, message: "fetched all routers" };
       }
@@ -88,17 +106,14 @@ export class RouterService {
   }
   async routerById(domain: string) {
     try {
-      const route = await this.prisma.router.findUnique({
+      const router = await this.prisma.router.findUnique({
         where: { domain },
       });
-      if (!route) {
-        throw new HttpException(
-          "this route does'nt exist",
-          HttpStatus.BAD_REQUEST,
-        );
+      if (!router) {
+        throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
 
-      return { ...route, message: "router fetched successfully" };
+      return { ...router, message: "router fetched successfully" };
     } catch (err) {
       return err;
     }
