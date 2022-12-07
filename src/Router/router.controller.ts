@@ -8,6 +8,7 @@ import {
   Get,
   Req,
   UseGuards,
+  Query,
 } from "@nestjs/common";
 import { RouterService } from "./router.service";
 import { CreateRouterDto } from "./dtos/createRouter.dto";
@@ -31,9 +32,14 @@ export class RouterController {
   ) {
     return this.routerService.updateRouter(updateRouterDto, domain);
   }
-  @Get("")
-  allRoutes() {
-    return this.routerService.allRouters();
+  @Get(":searsh?")
+  allRoutes(
+    @Query("take") take?: string,
+    @Query("skip") skip?: string,
+    @Query("type") type?: string,
+    @Param("searsh") searsh?: string,
+  ) {
+    return this.routerService.allRouters(take, skip, type, searsh);
   }
   @Get(":domain")
   routerbyId(@Param("domain") domain: string) {

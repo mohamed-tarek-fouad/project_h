@@ -52,16 +52,36 @@ export class RouterService {
       return err;
     }
   }
-  async allRouters() {
+  async allRouters(take: string, skip: string, type: any, searsh: string) {
     try {
-      const routers = await this.prisma.router.findMany({});
-      if (routers.length === 0) {
-        throw new HttpException(
-          "routers does'nt exist",
-          HttpStatus.BAD_REQUEST,
-        );
+      if (take) {
+        if (!skip) {
+          skip = "0";
+        }
+        const routers = await this.prisma.router.findMany({
+          take: parseInt(take),
+          skip: parseInt(skip),
+          where: {
+            type,
+            domainName: { contains: searsh },
+          },
+        });
+        if (!routers) {
+          throw new HttpException("no routers exist", HttpStatus.BAD_REQUEST);
+        }
+        return { ...routers, message: "fetched all routers" };
+      } else {
+        const routers = await this.prisma.router.findMany({
+          where: {
+            type,
+            domainName: { contains: searsh },
+          },
+        });
+        if (!routers) {
+          throw new HttpException("no routers exist", HttpStatus.BAD_REQUEST);
+        }
+        return { ...routers, message: "fetched all routers" };
       }
-      return { ...routers, message: "fetched all routers" };
     } catch (err) {
       return err;
     }
