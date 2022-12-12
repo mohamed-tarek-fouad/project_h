@@ -66,6 +66,7 @@ export class RouterService {
         data: updateRouterDto,
       });
       await this.cacheManager.del("routers");
+      await this.cacheManager.del(domain);
       return { ...updatedRoute, message: "router updated successfully" };
     } catch (err) {
       return err;
@@ -73,13 +74,15 @@ export class RouterService {
   }
   async allRouters(take: string, skip: string, type: any, searsh: string) {
     try {
-      const isCached = await this.cacheManager.get("routers");
-      if (isCached) {
-        return { isCached, message: "fetched all users successfully" };
-      }
       if (take) {
         if (!skip) {
           skip = "0";
+        }
+        const isCached = await this.cacheManager.get(
+          `routers${take}${skip}${type}${searsh}`,
+        );
+        if (isCached) {
+          return { isCached, message: "fetched all routers successfully" };
         }
         const routers = await this.prisma.router.findMany({
           take: parseInt(take),
@@ -95,9 +98,16 @@ export class RouterService {
             HttpStatus.BAD_REQUEST,
           );
         }
-        await this.cacheManager.set("routers", routers);
+        await this.cacheManager.set(
+          `routers${take}${skip}${type}${searsh}`,
+          routers,
+        );
         return { ...routers, message: "fetched all routers" };
       } else {
+        const isCached = await this.cacheManager.get(`routers${type}${searsh}`);
+        if (isCached) {
+          return { isCached, message: "fetched all routers successfully" };
+        }
         const routers = await this.prisma.router.findMany({
           where: {
             type,
@@ -110,7 +120,7 @@ export class RouterService {
             HttpStatus.BAD_REQUEST,
           );
         }
-        await this.cacheManager.set("routers", routers);
+        await this.cacheManager.set(`routers${type}${searsh}`, routers);
         return { ...routers, message: "fetched all routers" };
       }
     } catch (err) {
@@ -129,7 +139,7 @@ export class RouterService {
       if (!router) {
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
-      await this.cacheManager.set("routerId", domain);
+      await this.cacheManager.set(domain, router);
       return { ...router, message: "router fetched successfully" };
     } catch (err) {
       return err;

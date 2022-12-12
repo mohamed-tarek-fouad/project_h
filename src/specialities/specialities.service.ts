@@ -49,6 +49,7 @@ export class SpecialitiesService {
         });
       });
       await this.cacheManager.del(`doctors${createSpecialityDto.id}`);
+      await this.cacheManager.del("doctors");
       return { message: "doctor created successfully" };
     } catch (err) {
       return err;
@@ -75,6 +76,7 @@ export class SpecialitiesService {
         });
       });
       await this.cacheManager.del(`routers${createSpecialityDto.id}`);
+      await this.cacheManager.del("routers");
       return {
         message: "router speciality created successfully",
       };
@@ -94,10 +96,10 @@ export class SpecialitiesService {
             specialityId: speciality,
           },
         });
-        await this.cacheManager.set("doctors", doctors);
+        await this.cacheManager.set(`doctors${speciality}`, doctors);
         return { ...doctors, message: "fetched all doctors successfully" };
       } else {
-        const isCached = await this.cacheManager.get(`doctors${speciality}`);
+        const isCached = await this.cacheManager.get("doctors");
         if (isCached) {
           return { isCached, message: "fetched all doctors successfully" };
         }
@@ -112,7 +114,7 @@ export class SpecialitiesService {
   async allRoutersSpeciality(speciality: string) {
     try {
       if (speciality) {
-        const isCached = await this.cacheManager.get(`router${speciality}`);
+        const isCached = await this.cacheManager.get(`routers${speciality}`);
         if (isCached) {
           return { isCached, message: "fetched all routers successfully" };
         }
@@ -121,10 +123,10 @@ export class SpecialitiesService {
             specialityId: speciality,
           },
         });
-        await this.cacheManager.set("routers", routers);
+        await this.cacheManager.set(`routers${speciality}`, routers);
         return { ...routers, message: "fetched all routers successfully" };
       } else {
-        const isCached = await this.cacheManager.get(`router${speciality}`);
+        const isCached = await this.cacheManager.get("routers");
         if (isCached) {
           return { isCached, message: "fetched all routers successfully" };
         }

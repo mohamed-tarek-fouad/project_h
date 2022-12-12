@@ -48,6 +48,7 @@ export class UsersService {
       });
       delete updatedUser.password;
       await this.cacheManager.del("users");
+      await this.cacheManager.del(`user${id}`);
       return { ...updatedUser, message: "user updated successfully" };
     } catch (err) {
       return err;
@@ -55,6 +56,10 @@ export class UsersService {
   }
   async userById(id: string) {
     try {
+      const isCached = await this.cacheManager.get("users");
+      if (isCached) {
+        return { isCached, message: "fetched all users successfully" };
+      }
       const user = await this.prisma.users.findUnique({
         where: {
           id,
@@ -79,6 +84,7 @@ export class UsersService {
         };
       });
       delete user.routerAdmin;
+      await this.cacheManager.set(`user${id}`, user);
       return { ...user, routerAdmin, message: "user fetched successfully" };
     } catch (err) {
       return err;

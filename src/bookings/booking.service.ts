@@ -80,6 +80,7 @@ export class BookingService {
           userId: req.user.userId,
         },
       });
+      await this.cacheManager.del(`booking${id}`);
       await this.cacheManager.del("bookings");
       return { ...booking, message: "booking updated successfully" };
     } catch (err) {
@@ -90,7 +91,7 @@ export class BookingService {
     try {
       const isCached = await this.cacheManager.get("bookings");
       if (isCached) {
-        return { isCached, message: "fetched all users successfully" };
+        return { isCached, message: "fetched all bookings successfully" };
       }
       const bookings = await this.prisma.booking.findMany({
         where: {
@@ -111,6 +112,10 @@ export class BookingService {
   }
   async bookingById(id: string) {
     try {
+      const isCached = await this.cacheManager.get(`booking${id}`);
+      if (isCached) {
+        return { isCached, message: "fetched  booking successfully" };
+      }
       const booking = await this.prisma.booking.findUnique({
         where: {
           id,
@@ -122,6 +127,7 @@ export class BookingService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      await this.cacheManager.set(`booking${id}`, booking);
       return { ...booking, message: "booking fetched successfully" };
     } catch (err) {
       return err;
@@ -145,6 +151,7 @@ export class BookingService {
           id,
         },
       });
+      await this.cacheManager.del(`booking${id}`);
       await this.cacheManager.del("bookings");
       return { message: "booking canceled" };
     } catch (err) {

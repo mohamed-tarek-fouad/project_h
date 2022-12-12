@@ -32,7 +32,7 @@ export class RouterController {
   ) {
     return this.routerService.updateRouter(updateRouterDto, domain);
   }
-  @Get(":searsh?")
+  @Get("routers/:searsh?")
   allRoutes(
     @Query("take") take?: string,
     @Query("skip") skip?: string,

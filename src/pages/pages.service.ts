@@ -44,7 +44,6 @@ export class PagesService {
       const page = await this.prisma.pages.create({
         data: { ...createPageDto, routerId: id },
       });
-      await this.cacheManager.del(createPageDto.url);
       return { ...page, message: "page created successfully" };
     } catch (err) {
       return err;
@@ -63,10 +62,6 @@ export class PagesService {
   ): Promise<any> {
     try {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
-      const isCached = await this.cacheManager.get(url);
-      if (isCached) {
-        return { isCached, message: "fetched page successfully" };
-      }
       const pageExist = await this.prisma.pages.findFirst({
         where: {
           AND: [{ routerId: router }, { url }],
@@ -95,7 +90,7 @@ export class PagesService {
         },
         data: updatePageDto,
       });
-      await this.cacheManager.del(url);
+      await this.cacheManager.del(`${router}${url}`);
 
       return { message: "updated page successfully" };
     } catch (err) {
@@ -114,7 +109,7 @@ export class PagesService {
   ) {
     try {
       url = await this.concat.ConcatString(url, ex1, ex2, ex3, ex4, ex5, ex6);
-      const isCached = await this.cacheManager.get(url);
+      const isCached = await this.cacheManager.get(`${router}${url}`);
       if (isCached) {
         return { isCached, message: "fetched page successfully" };
       }
@@ -129,7 +124,7 @@ export class PagesService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      await this.cacheManager.set("page", url);
+      await this.cacheManager.set(`${router}${url}`, page);
       return { ...page, message: "page fetched successfully" };
     } catch (err) {
       return err;
@@ -163,7 +158,7 @@ export class PagesService {
           AND: [{ routerId: router }, { url }],
         },
       });
-      await this.cacheManager.del(url);
+      await this.cacheManager.del(`${router}${url}`);
       return { message: "page deleted successfully" };
     } catch (err) {
       return err;
