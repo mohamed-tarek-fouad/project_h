@@ -5,10 +5,16 @@ import { PrismaService } from "src/prisma.service";
 import { CreateBookingDto } from "./dtos/createBooking.dto";
 import { HttpException } from "@nestjs/common";
 import { HttpStatus } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/common";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class BookingService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
   async createBooking(createBookingDto: CreateBookingDto, id: string, req) {
     try {
       const router = await this.prisma.router.findUnique({
@@ -30,6 +36,7 @@ export class BookingService {
           userId: req.user.userId,
         },
       });
+      await this.cacheManager.del("bookings");
       return { ...booking, message: "booking created successfully" };
     } catch (err) {
       return err;
@@ -73,6 +80,7 @@ export class BookingService {
           userId: req.user.userId,
         },
       });
+      await this.cacheManager.del("bookings");
       return { ...booking, message: "booking updated successfully" };
     } catch (err) {
       return err;
@@ -80,6 +88,10 @@ export class BookingService {
   }
   async allBookings(routerId: string) {
     try {
+      const isCached = await this.cacheManager.get("bookings");
+      if (isCached) {
+        return { isCached, message: "fetched all users successfully" };
+      }
       const bookings = await this.prisma.booking.findMany({
         where: {
           bookingID: routerId,
@@ -91,6 +103,7 @@ export class BookingService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      await this.cacheManager.set("bookings", bookings);
       return { ...bookings, message: "bookings fetched successfully" };
     } catch (err) {
       return err;
@@ -132,6 +145,7 @@ export class BookingService {
           id,
         },
       });
+      await this.cacheManager.del("bookings");
       return { message: "booking canceled" };
     } catch (err) {
       return err;

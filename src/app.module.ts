@@ -39,7 +39,7 @@ import * as CacheStore from "cache-manager-ioredis";
       store: CacheStore,
       host: "localhost",
       port: 6379,
-      ttl: 60 * 60,
+      ttl: 60 * 60 * 6,
     }),
   ],
 

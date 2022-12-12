@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { Cron, CronExpression } from "@nestjs/schedule";
-import { Injectable } from "@nestjs/common";
+import { CACHE_MANAGER, Inject, Injectable } from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "./../prisma.service";
 import { CreateUserDto } from "./dtos/createUser.dto";
@@ -10,12 +10,15 @@ import { HttpStatus } from "@nestjs/common";
 import { MailerService } from "@nestjs-modules/mailer/dist";
 import { ForgetPasswordDto } from "./dtos/forgetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
+import { Cache } from "cache-manager";
+
 @Injectable()
 export class AuthService {
   constructor(
     private jwtServise: JwtService,
     private prisma: PrismaService,
     private mailerService: MailerService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
   ) {}
   async validateUser(email: string, password: string) {
     try {
@@ -89,6 +92,7 @@ export class AuthService {
           profilePic: profilePic ? profilePic.path : "null",
         },
       });
+      await this.cacheManager.del("users");
       return { ...user, message: "user already exists" };
     } catch (err) {
       return err;

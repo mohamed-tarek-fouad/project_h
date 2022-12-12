@@ -16,15 +16,15 @@ export class UsersService {
   ) {}
   async allUsers() {
     try {
-      // const isCached = await this.cacheManager.get("users");
-      // if (isCached) {
-      //   return { isCached, message: "fetched all users successfully" };
-      // }
+      const isCached = await this.cacheManager.get("users");
+      if (isCached) {
+        return { isCached, message: "fetched all users successfully" };
+      }
       const user = await this.prisma.users.findMany({});
       if (user.length === 0) {
         throw new HttpException("user does'nt exist", HttpStatus.BAD_REQUEST);
       }
-      // await this.cacheManager.set("users", user);
+      await this.cacheManager.set("users", user);
       return { ...user, message: "fetched all users successfully" };
     } catch (err) {
       return err;
@@ -47,6 +47,7 @@ export class UsersService {
         data: updateUserDto,
       });
       delete updatedUser.password;
+      await this.cacheManager.del("users");
       return { ...updatedUser, message: "user updated successfully" };
     } catch (err) {
       return err;

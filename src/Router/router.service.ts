@@ -5,10 +5,16 @@ import { PrismaService } from "./../prisma.service";
 import { UpdateRouterDto } from "./dtos/updateRouter.dto";
 import { HttpStatus } from "@nestjs/common";
 import { HttpException } from "@nestjs/common";
+import { Inject } from "@nestjs/common";
+import { CACHE_MANAGER } from "@nestjs/common";
+import { Cache } from "cache-manager";
 
 @Injectable()
 export class RouterService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cacheManager: Cache,
+  ) {}
   async createRouter(createRouterDto: CreateRouterDto, req) {
     try {
       if (!createRouterDto.schedule) {
@@ -37,6 +43,7 @@ export class RouterService {
           userId: req.user.userId,
         },
       });
+      await this.cacheManager.del("routers");
       return { ...router, message: "router created successfully" };
     } catch (err) {
       err;
@@ -58,6 +65,7 @@ export class RouterService {
         },
         data: updateRouterDto,
       });
+      await this.cacheManager.del("routers");
       return { ...updatedRoute, message: "router updated successfully" };
     } catch (err) {
       return err;
@@ -65,6 +73,10 @@ export class RouterService {
   }
   async allRouters(take: string, skip: string, type: any, searsh: string) {
     try {
+      const isCached = await this.cacheManager.get("routers");
+      if (isCached) {
+        return { isCached, message: "fetched all users successfully" };
+      }
       if (take) {
         if (!skip) {
           skip = "0";
@@ -83,7 +95,7 @@ export class RouterService {
             HttpStatus.BAD_REQUEST,
           );
         }
-
+        await this.cacheManager.set("routers", routers);
         return { ...routers, message: "fetched all routers" };
       } else {
         const routers = await this.prisma.router.findMany({
@@ -98,6 +110,7 @@ export class RouterService {
             HttpStatus.BAD_REQUEST,
           );
         }
+        await this.cacheManager.set("routers", routers);
         return { ...routers, message: "fetched all routers" };
       }
     } catch (err) {
@@ -106,13 +119,17 @@ export class RouterService {
   }
   async routerById(domain: string) {
     try {
+      const isCached = await this.cacheManager.get(domain);
+      if (isCached) {
+        return { isCached, message: "fetched all users successfully" };
+      }
       const router = await this.prisma.router.findUnique({
         where: { domain },
       });
       if (!router) {
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
-
+      await this.cacheManager.set("routerId", domain);
       return { ...router, message: "router fetched successfully" };
     } catch (err) {
       return err;
