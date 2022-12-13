@@ -131,12 +131,12 @@ export class RouterService {
     try {
       const isCached = await this.cacheManager.get(domain);
       if (isCached) {
-        return { isCached, message: "fetched all users successfully" };
+        return { isCached, message: "fetched router successfully" };
       }
       const router = await this.prisma.router.findUnique({
         where: { domain },
         include: {
-          pages: true,
+          pages: { select: { url: true } },
         },
       });
       if (!router) {

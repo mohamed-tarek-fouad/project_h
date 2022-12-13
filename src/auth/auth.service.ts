@@ -93,7 +93,7 @@ export class AuthService {
         },
       });
       await this.cacheManager.del("users");
-      return { ...user, message: "user already exists" };
+      return { ...user, message: "user has been created successfully" };
     } catch (err) {
       return err;
     }
@@ -119,7 +119,7 @@ export class AuthService {
         },
       });
       if (!validateUser) {
-        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
+        throw new HttpException("email doesn't exist", HttpStatus.BAD_REQUEST);
       }
 
       const secret = process.env.ACCESS_SECRET + validateUser.password;

@@ -128,10 +128,10 @@ model Users {
   lastname         String
   email            String             @unique
   password         String
-  address          String             @default("null")
+  address          String?
   phoneNumber      String
-  profilePic       String             @default("null")
-  info             String             @default("null")
+  profilePic       String?
+  info             String?
   tokens           tokens[]
   votes            Votes[]
   role             UserRole           @default(user)
