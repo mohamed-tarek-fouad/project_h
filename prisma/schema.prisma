@@ -142,8 +142,8 @@ model Users {
 
 model Votes {
   id     String @id @default(auto()) @map("_id") @db.ObjectId
-  voteId String
-  userId String
+  voteId String @db.ObjectId
+  userId String @db.ObjectId
   user   Users  @relation(fields: [userId], references: [id])
   vote   Router @relation(fields: [voteId], references: [domain])
   rate   Int
@@ -151,7 +151,7 @@ model Votes {
 
 model tokens {
   id        String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId    String
+  userId    String   @db.ObjectId
   expiresAt DateTime
   user      Users    @relation(fields: [userId], references: [id])
 }
@@ -189,8 +189,8 @@ type Settings {
 
 model RouterAdmin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
-  routerId String
-  userId   String
+  routerId String @db.ObjectId
+  userId   String @db.ObjectId
   router   Router @relation(fields: [routerId], references: [domain])
   user     Users  @relation(fields: [userId], references: [id])
 }
@@ -199,7 +199,7 @@ model Pages {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   url      String
   page     Json
-  routerId String
+  routerId String @db.ObjectId
   router   Router @relation(fields: [routerId], references: [domain])
 
   @@unique([url, routerId])
@@ -207,9 +207,9 @@ model Pages {
 
 model Booking {
   id          String @id @default(auto()) @map("_id") @db.ObjectId
-  bookingID   String
+  bookingID   String @db.ObjectId
   bookingInfo Router @relation(fields: [bookingID], references: [domain])
-  userId      String
+  userId      String @db.ObjectId
   user        Users  @relation(fields: [userId], references: [id])
   details     Json
 }
@@ -222,17 +222,17 @@ model Specialities {
 
 model doctorSpeciality {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  specialityId String
+  specialityId String       @db.ObjectId
   speciality   Specialities @relation(fields: [specialityId], references: [id])
-  doctorId     String
+  doctorId     String       @db.ObjectId
   doctor       Users        @relation(fields: [doctorId], references: [id])
 }
 
 model routerSpecialities {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  specialityId String
+  specialityId String       @db.ObjectId
   speciality   Specialities @relation(fields: [specialityId], references: [id])
-  routerId     String
+  routerId     String       @db.ObjectId
   router       Router       @relation(fields: [routerId], references: [domain])
 }
 

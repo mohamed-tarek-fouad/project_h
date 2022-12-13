@@ -135,6 +135,9 @@ export class RouterService {
       }
       const router = await this.prisma.router.findUnique({
         where: { domain },
+        include: {
+          pages: true,
+        },
       });
       if (!router) {
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
