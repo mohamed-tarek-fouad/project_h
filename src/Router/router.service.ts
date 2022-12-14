@@ -52,12 +52,6 @@ export class RouterService {
     images: any,
   ) {
     try {
-      let totalSize = 0;
-      const imagePath = [];
-      images.forEach((element) => {
-        totalSize = totalSize + parseInt(element.size);
-        imagePath.push(element.path);
-      });
       const routerExist = await this.prisma.router.findUnique({
         where: {
           domain,
@@ -66,6 +60,13 @@ export class RouterService {
       if (!routerExist) {
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
+      let totalSize = routerExist.images ? routerExist.images.totalSize : 0;
+
+      const imagePath = [];
+      images.forEach((element) => {
+        totalSize = totalSize + parseInt(element.size);
+        imagePath.push(element.path);
+      });
       const updatedRoute = await this.prisma.router.update({
         where: {
           domain,

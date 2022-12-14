@@ -64,14 +64,14 @@ export class RouterController {
   ) {
     return this.routerService.updateRouter(updateRouterDto, domain, images);
   }
-  @Get("routers/:searsh?")
+  @Get("routers/:search?")
   allRoutes(
     @Query("take") take?: string,
     @Query("skip") skip?: string,
     @Query("type") type?: string,
-    @Param("searsh") searsh?: string,
+    @Param("search") search?: string,
   ) {
-    return this.routerService.allRouters(take, skip, type, searsh);
+    return this.routerService.allRouters(take, skip, type, search);
   }
   @Get(":domain")
   routerbyId(@Param("domain") domain: string) {
