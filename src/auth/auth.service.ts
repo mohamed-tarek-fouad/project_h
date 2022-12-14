@@ -89,7 +89,7 @@ export class AuthService {
       const user = await this.prisma.users.create({
         data: {
           ...userDto,
-          profilePic: profilePic ? profilePic.path : "null",
+          profilePic: profilePic ? profilePic.path : null,
         },
       });
       await this.cacheManager.del("users");

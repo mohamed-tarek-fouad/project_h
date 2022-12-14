@@ -159,15 +159,16 @@ model tokens {
 model Router {
   domain             String               @id @default(auto()) @map("_id") @db.ObjectId
   domainName         String
-  phoneNumber        String               @default("null")
-  whatsapp           String               @default("null")
-  schedule           Schedule
-  settings           Settings
+  phoneNumber        String?
+  whatsapp           String?
+  schedule           Schedule?
+  settings           Settings?
   location           String
   rating             Float                @default(0)
   totalRating        Int                  @default(0)
   voters             Int                  @default(0)
-  fees               Float                @default(0)
+  fees               Float?
+  images             ImageStore?
   type               Speciality
   routerAdmin        RouterAdmin[]
   pages              Pages[]
@@ -176,23 +177,28 @@ model Router {
   routerSpecialities routerSpecialities[]
 }
 
-type Schedule {
-  startAt       DateTime
-  endAt         DateTime
-  days          String[]
-  estimatedTime Int
-}
-
-type Settings {
-  themes String
-}
-
 model RouterAdmin {
   id       String @id @default(auto()) @map("_id") @db.ObjectId
   routerId String @db.ObjectId
   userId   String @db.ObjectId
   router   Router @relation(fields: [routerId], references: [domain])
   user     Users  @relation(fields: [userId], references: [id])
+}
+
+type Schedule {
+  startAt       DateTime?
+  endAt         DateTime?
+  days          String[]
+  estimatedTime Int?
+}
+
+type Settings {
+  themes String
+}
+
+type ImageStore {
+  images    String[]
+  totalSize Float    @default(0)
 }
 
 model Pages {

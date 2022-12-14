@@ -6,7 +6,7 @@ export class CreateRouterDto {
   @IsNotEmpty()
   domainName: string;
   @ApiProperty()
-  settings: any;
+  settings: Settings;
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   phoneNumber: string;
@@ -15,12 +15,27 @@ export class CreateRouterDto {
   whatsapp: string;
   @ApiProperty()
   @IsOptional()
-  schedule: any;
+  schedule: Schedule;
   @ApiProperty({ example: "fayoum" })
   location: string;
   @ApiProperty({ example: 300 })
   @IsOptional()
   fees: number;
   @ApiProperty({ example: "hospital" })
-  type: any;
+  type: Speciality;
+}
+type Schedule = {
+  startAt: string;
+  endAt: string;
+  days: string[];
+  estimatedTime: number;
+};
+
+type Settings = {
+  themes: string;
+};
+enum Speciality {
+  hospital = "hospital",
+  clinic = "clinic",
+  lab = "lab",
 }

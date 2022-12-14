@@ -9,7 +9,7 @@ export class UpdateRouterDto {
   domainName: string;
   @ApiProperty({ example: { test: "test" } })
   @IsOptional()
-  settings: any;
+  settings: Settings;
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   phoneNumber: string;
@@ -18,7 +18,7 @@ export class UpdateRouterDto {
   whatsapp: string;
   @ApiProperty()
   @IsOptional()
-  schedule: object;
+  schedule: Schedule;
   @ApiProperty({ example: "fayoum" })
   location: string;
   @ApiProperty({ example: 300 })
@@ -26,5 +26,20 @@ export class UpdateRouterDto {
   fees: number;
   @ApiProperty({ example: "hospital" })
   @IsOptional()
-  type: any;
+  type: Speciality;
+}
+type Schedule = {
+  startAt: string;
+  endAt: string;
+  days: string[];
+  estimatedTime: number;
+};
+
+type Settings = {
+  themes: string;
+};
+enum Speciality {
+  hospital = "hospital",
+  clinic = "clinic",
+  lab = "lab",
 }

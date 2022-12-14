@@ -17,9 +17,6 @@ export class RouterService {
   ) {}
   async createRouter(createRouterDto: CreateRouterDto, req) {
     try {
-      if (!createRouterDto.schedule) {
-        createRouterDto.schedule = { smth: "smth" };
-      }
       const routerExist = await this.prisma.router.findFirst({
         where: {
           AND: [
@@ -49,8 +46,18 @@ export class RouterService {
       err;
     }
   }
-  async updateRouter(updateRouterDto: UpdateRouterDto, domain: string) {
+  async updateRouter(
+    updateRouterDto: UpdateRouterDto,
+    domain: string,
+    images: any,
+  ) {
     try {
+      let totalSize = 0;
+      const imagePath = [];
+      images.forEach((element) => {
+        totalSize = totalSize + parseInt(element.size);
+        imagePath.push(element.path);
+      });
       const routerExist = await this.prisma.router.findUnique({
         where: {
           domain,
@@ -63,7 +70,7 @@ export class RouterService {
         where: {
           domain,
         },
-        data: updateRouterDto,
+        data: { ...updateRouterDto, images: { images: imagePath, totalSize } },
       });
       await this.cacheManager.del("routers");
       await this.cacheManager.del(domain);

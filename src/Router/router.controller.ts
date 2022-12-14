@@ -9,12 +9,22 @@ import {
   Req,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
 } from "@nestjs/common";
 import { RouterService } from "./router.service";
 import { CreateRouterDto } from "./dtos/createRouter.dto";
 import { UpdateRouterDto } from "./dtos/updateRouter.dto";
 import { JwtAuthGuard } from "./../jwtAuthGuard";
 import { ApiBearerAuth } from "@nestjs/swagger";
+import {
+  AnyFilesInterceptor,
+  FileInterceptor,
+  FilesInterceptor,
+} from "@nestjs/platform-express";
+import { diskStorage } from "multer";
+import path, { extname } from "path";
+import { UploadedFiles } from "@nestjs/common/decorators";
 @Controller("router")
 export class RouterController {
   constructor(private routerService: RouterService) {}
@@ -26,11 +36,33 @@ export class RouterController {
   }
   @ApiBearerAuth("access-token")
   @Patch("update/:domain")
+  @UseInterceptors(
+    FilesInterceptor("images", 20, {
+      preservePath: true,
+      fileFilter(req, file, cb) {
+        if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+          return cb(new Error("Only image files are allowed!"), false);
+        }
+        cb(null, true);
+      },
+      storage: diskStorage({
+        destination: "./uploads",
+        filename: (req, file, cb) => {
+          const randomName = Array(32)
+            .fill(null)
+            .map(() => Math.round(Math.random() * 16).toString(16))
+            .join("");
+          cb(null, `${randomName}${extname(file.originalname)}`);
+        },
+      }),
+    }),
+  )
   updateRouter(
     @Body() updateRouterDto: UpdateRouterDto,
     @Param("domain") domain: string,
+    @UploadedFiles() images,
   ) {
-    return this.routerService.updateRouter(updateRouterDto, domain);
+    return this.routerService.updateRouter(updateRouterDto, domain, images);
   }
   @Get("routers/:searsh?")
   allRoutes(
