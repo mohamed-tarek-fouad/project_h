@@ -10,6 +10,8 @@ import { JwtAuthGuard } from "./jwtAuthGuard";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { ConfigModule, ConfigService } from "@nestjs/config";
 import * as CacheStore from "cache-manager-ioredis";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 @Module({
   imports: [
     SpecialitiesModule,
@@ -40,6 +42,9 @@ import * as CacheStore from "cache-manager-ioredis";
       host: "localhost",
       port: 6379,
       ttl: 60 * 60 * 6,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(__dirname, "..", "uploads"),
     }),
   ],
 

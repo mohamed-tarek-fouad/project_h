@@ -17,13 +17,9 @@ import { CreateRouterDto } from "./dtos/createRouter.dto";
 import { UpdateRouterDto } from "./dtos/updateRouter.dto";
 import { JwtAuthGuard } from "./../jwtAuthGuard";
 import { ApiBearerAuth } from "@nestjs/swagger";
-import {
-  AnyFilesInterceptor,
-  FileInterceptor,
-  FilesInterceptor,
-} from "@nestjs/platform-express";
+import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
-import path, { extname } from "path";
+import { extname } from "path";
 import { UploadedFiles } from "@nestjs/common/decorators";
 @Controller("router")
 export class RouterController {
