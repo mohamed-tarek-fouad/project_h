@@ -91,6 +91,7 @@ export class PagesService {
         data: updatePageDto,
       });
       await this.cacheManager.del(`${router}${url}`);
+      await this.cacheManager.del(router);
       return { message: "updated page successfully" };
     } catch (err) {
       return err;
