@@ -75,17 +75,20 @@ export class PagesService {
           HttpStatus.BAD_REQUEST,
         );
       }
-      const conflictPages = await this.prisma.pages.findFirst({
-        where: {
-          AND: [{ routerId: router }, { url: updatePageDto.url }],
-        },
-      });
-      if (conflictPages) {
-        throw new HttpException(
-          "this page url already exists",
-          HttpStatus.BAD_REQUEST,
-        );
+      if (updatePageDto.url) {
+        const conflictPages = await this.prisma.pages.findFirst({
+          where: {
+            AND: [{ routerId: router }, { url: updatePageDto.url }],
+          },
+        });
+        if (conflictPages) {
+          throw new HttpException(
+            "this page url already exists",
+            HttpStatus.BAD_REQUEST,
+          );
+        }
       }
+
       await this.prisma.pages.updateMany({
         where: {
           AND: [{ routerId: router }, { url }],
