@@ -44,6 +44,8 @@ export class PagesService {
       const page = await this.prisma.pages.create({
         data: { ...createPageDto, routerId: id },
       });
+      await this.cacheManager.del(id);
+
       return { ...page, message: "page created successfully" };
     } catch (err) {
       return err;
