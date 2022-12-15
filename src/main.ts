@@ -3,6 +3,7 @@ import { SwaggerModule, DocumentBuilder } from "@nestjs/swagger";
 import { AppModule } from "./app.module";
 import { NestExpressApplication } from "@nestjs/platform-express";
 import { join } from "path";
+import { ValidationPipe } from "@nestjs/common/pipes";
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   app.useStaticAssets(join(__dirname, "..", "uploads"), {
@@ -10,7 +11,7 @@ async function bootstrap() {
     prefix: "/uploads",
   });
   app.enableCors();
-
+  app.useGlobalPipes(new ValidationPipe());
   const config = new DocumentBuilder()
     .setTitle("Project_H")
     .setDescription("MALAAAAANAAAAAAAAAA")

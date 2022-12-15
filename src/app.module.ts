@@ -40,7 +40,7 @@ import { join } from "path";
       isGlobal: true,
       store: CacheStore,
       host: "localhost",
-      port: 6379,
+      port: 6666,
       ttl: 60 * 60 * 6,
     }),
     ServeStaticModule.forRoot({

@@ -10,7 +10,6 @@ import {
   UseGuards,
   Query,
   UseInterceptors,
-  UploadedFile,
 } from "@nestjs/common";
 import { RouterService } from "./router.service";
 import { CreateRouterDto } from "./dtos/createRouter.dto";
