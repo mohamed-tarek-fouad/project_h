@@ -26,6 +26,7 @@ export class UpdateRouterDto {
   schedule: Schedule;
   @ApiProperty({ example: "fayoum" })
   @IsNotEmpty()
+  @IsOptional()
   location: string;
   @ApiProperty({ example: 300 })
   @IsNotEmpty()

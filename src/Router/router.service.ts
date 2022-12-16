@@ -84,15 +84,12 @@ export class RouterService {
         data: { ...updateRouterDto, images: { images: imagePath, totalSize } },
       });
       routerExist.images.images.forEach(async (element) => {
-        await fs.unlink(
-          `./uploads/${routerExist.images.images[element]}`,
-          (err) => {
-            if (err) {
-              console.error(err);
-              return err;
-            }
-          },
-        );
+        await fs.unlink(`./uploads/${element}`, (err) => {
+          if (err) {
+            console.error(err);
+            return err;
+          }
+        });
       });
 
       await this.cacheManager.del("routers");
