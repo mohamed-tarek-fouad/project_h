@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { ApiProperty } from "@nestjs/swagger/dist/decorators";
-import { IsNotEmpty, IsOptional } from "class-validator";
+import { IsNotEmpty, IsOptional, IsPhoneNumber } from "class-validator";
 
 export class UpdateRouterDto {
   @ApiProperty({ example: "mawlana" })
@@ -9,21 +9,29 @@ export class UpdateRouterDto {
   domainName: string;
   @ApiProperty({ example: { test: "test" } })
   @IsOptional()
+  @IsNotEmpty()
   settings: Settings;
+  @IsNotEmpty()
+  @IsPhoneNumber()
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   phoneNumber: string;
   @ApiProperty({ example: "01006388619" })
+  @IsNotEmpty()
   @IsOptional()
   whatsapp: string;
   @ApiProperty()
+  @IsNotEmpty()
   @IsOptional()
   schedule: Schedule;
   @ApiProperty({ example: "fayoum" })
+  @IsNotEmpty()
   location: string;
   @ApiProperty({ example: 300 })
+  @IsNotEmpty()
   @IsOptional()
   fees: number;
+  @IsNotEmpty()
   @ApiProperty({ example: "hospital" })
   @IsOptional()
   type: Speciality;

@@ -20,21 +20,25 @@ const passwordRequirement: PasswordValidationRequirement = {
   mustContainUpperLetter: true,
 };
 import { ApiProperty } from "@nestjs/swagger/dist/decorators";
-export class CreateUserDto {
+export class UpdateUserDto {
   @ApiProperty({ example: "mohamed" })
   @MinLength(3)
   @IsNotEmpty()
+  @IsOptional()
   firstname: string;
   @ApiProperty({ example: "tarek" })
   @IsNotEmpty()
+  @IsOptional()
   @MinLength(3)
   lastname: string;
   @ApiProperty({ example: "mdmedoo7@gmail.com" })
   @IsNotEmpty()
+  @IsOptional()
   @IsEmail()
   email: string;
   @ApiProperty({ example: "123mM123@" })
   @IsNotEmpty()
+  @IsOptional()
   @IsString()
   @MinLength(6)
   @MaxLength(20)
@@ -45,6 +49,7 @@ export class CreateUserDto {
   address: string;
   @ApiProperty({ example: "01006388619" })
   @IsNotEmpty()
+  @IsOptional()
   @IsPhoneNumber()
   phoneNumber: string;
   @ApiProperty({ example: "gamed neeeeeeeeeeeeeeeek" })

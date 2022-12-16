@@ -8,6 +8,7 @@ import { HttpException } from "@nestjs/common";
 import { Inject } from "@nestjs/common";
 import { CACHE_MANAGER } from "@nestjs/common";
 import { Cache } from "cache-manager";
+import * as fs from "fs";
 
 @Injectable()
 export class RouterService {
@@ -58,6 +59,15 @@ export class RouterService {
         },
       });
       if (!routerExist) {
+        console.log(images);
+        images.forEach(async (image) => {
+          await fs.unlink(`./uploads/${image.filename}`, (err) => {
+            if (err) {
+              console.error(err);
+              return err;
+            }
+          });
+        });
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
       let totalSize = routerExist.images ? routerExist.images.totalSize : 0;
@@ -65,7 +75,7 @@ export class RouterService {
       const imagePath = [];
       images.forEach((element) => {
         totalSize = totalSize + parseInt(element.size);
-        imagePath.push(element.path);
+        imagePath.push(element.filename);
       });
       const updatedRoute = await this.prisma.router.update({
         where: {
@@ -73,6 +83,18 @@ export class RouterService {
         },
         data: { ...updateRouterDto, images: { images: imagePath, totalSize } },
       });
+      routerExist.images.images.forEach(async (element) => {
+        await fs.unlink(
+          `./uploads/${routerExist.images.images[element]}`,
+          (err) => {
+            if (err) {
+              console.error(err);
+              return err;
+            }
+          },
+        );
+      });
+
       await this.cacheManager.del("routers");
       await this.cacheManager.del(domain);
       return { ...updatedRoute, message: "router updated successfully" };

@@ -11,7 +11,8 @@ import { MailerService } from "@nestjs-modules/mailer/dist";
 import { ForgetPasswordDto } from "./dtos/forgetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
 import { Cache } from "cache-manager";
-
+import * as fs from "fs";
+import { UpdateUserDto } from "./dtos/updateUser.dto";
 @Injectable()
 export class AuthService {
   constructor(
@@ -74,7 +75,7 @@ export class AuthService {
       return err;
     }
   }
-  async register(userDto: CreateUserDto, profilePic) {
+  async register(userDto: CreateUserDto) {
     try {
       const userExist = await this.prisma.users.findUnique({
         where: {
@@ -87,10 +88,7 @@ export class AuthService {
       const saltOrRounds = 10;
       userDto.password = await bcrypt.hash(userDto.password, saltOrRounds);
       const user = await this.prisma.users.create({
-        data: {
-          ...userDto,
-          profilePic: profilePic ? profilePic.path : null,
-        },
+        data: userDto,
       });
       await this.cacheManager.del("users");
       return { ...user, message: "user has been created successfully" };
@@ -184,6 +182,53 @@ export class AuthService {
       });
       delete user.password;
       return { ...user, message: "reset password successfully" };
+    } catch (err) {
+      return err;
+    }
+  }
+  async updateUser(id: string, updateUserDto: UpdateUserDto, profilePic) {
+    try {
+      const user = await this.prisma.users.findUnique({
+        where: {
+          id,
+        },
+      });
+      if (!user) {
+        await fs.unlink(`./uploads/${profilePic.filename}`, (err) => {
+          if (err) {
+            console.error(err);
+            return err;
+          }
+        });
+        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
+      }
+      if (profilePic) {
+        const updatedUser = await this.prisma.users.update({
+          where: { id },
+          data: {
+            ...updateUserDto,
+            profilePic: profilePic.filename,
+          },
+        });
+        await fs.unlink(`./uploads/${user.profilePic}`, (err) => {
+          if (err) {
+            console.error(err);
+            return err;
+          }
+        });
+        await this.cacheManager.del("users");
+        await this.cacheManager.del(`user${id}`);
+        return { ...updatedUser, message: "user updated successfully" };
+      }
+      console.log(updateUserDto);
+      const updatedUser = await this.prisma.users.update({
+        where: { id },
+        data: updateUserDto,
+      });
+      delete updatedUser.password;
+      await this.cacheManager.del("users");
+      await this.cacheManager.del(`user${id}`);
+      return { ...updatedUser, message: "user updated successfully" };
     } catch (err) {
       return err;
     }

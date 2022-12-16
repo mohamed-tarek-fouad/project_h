@@ -19,6 +19,8 @@ import { diskStorage } from "multer";
 import { extname } from "path";
 import { ForgetPasswordDto } from "./dtos/forgetPassword.dto";
 import { ResetPasswordDto } from "./dtos/resetPassword.dto";
+import { Patch } from "@nestjs/common";
+import { UpdateUserDto } from "./dtos/updateUser.dto";
 @Controller("auth")
 export class AuthController {
   constructor(private authService: AuthService) {}
@@ -43,6 +45,27 @@ export class AuthController {
     return this.authService.login(req.user);
   }
   @Post("register")
+  register(@Body() createUserDto: CreateUserDto) {
+    return this.authService.register(createUserDto);
+  }
+  @ApiBearerAuth("access-token")
+  @UseGuards(JwtAuthGuard)
+  @Post("logout")
+  logout(@Req() req) {
+    return this.authService.logout(req);
+  }
+  @Post("forgetPassword")
+  forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
+    return this.authService.forgetPassword(forgetPasswordDto);
+  }
+  @Post("resetPassword/:id/:token")
+  resetPassword(
+    @Body() resetPasswordDto: ResetPasswordDto,
+    @Param("id") id: string,
+    @Param("token") token: string,
+  ) {
+    return this.authService.resetPassword(resetPasswordDto, id, token);
+  }
   @UseInterceptors(
     FileInterceptor("profilePic", {
       preservePath: true,
@@ -64,25 +87,12 @@ export class AuthController {
       }),
     }),
   )
-  register(@Body() createUserDto: CreateUserDto, @UploadedFile() profilePic) {
-    return this.authService.register(createUserDto, profilePic);
-  }
-  @ApiBearerAuth("access-token")
-  @UseGuards(JwtAuthGuard)
-  @Post("logout")
-  logout(@Req() req) {
-    return this.authService.logout(req);
-  }
-  @Post("forgetPassword")
-  forgetPassword(@Body() forgetPasswordDto: ForgetPasswordDto) {
-    return this.authService.forgetPassword(forgetPasswordDto);
-  }
-  @Post("resetPassword/:id/:token")
-  resetPassword(
-    @Body() resetPasswordDto: ResetPasswordDto,
+  @Patch(":id")
+  updateUser(
     @Param("id") id: string,
-    @Param("token") token: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @UploadedFile() profilePic,
   ) {
-    return this.authService.resetPassword(resetPasswordDto, id, token);
+    return this.authService.updateUser(id, updateUserDto, profilePic);
   }
 }

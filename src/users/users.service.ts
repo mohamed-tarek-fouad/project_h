@@ -6,7 +6,6 @@ import {
   Inject,
   CACHE_MANAGER,
 } from "@nestjs/common";
-import { UpdateUserDto } from "./dtos/updateUser.dto";
 import { Cache } from "cache-manager";
 @Injectable()
 export class UsersService {
@@ -31,29 +30,6 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto) {
-    try {
-      const user = await this.prisma.users.findUnique({
-        where: {
-          id,
-        },
-      });
-      if (!user) {
-        throw new HttpException("user doesn't exist", HttpStatus.BAD_REQUEST);
-      }
-
-      const updatedUser = await this.prisma.users.update({
-        where: { id },
-        data: updateUserDto,
-      });
-      delete updatedUser.password;
-      await this.cacheManager.del("users");
-      await this.cacheManager.del(`user${id}`);
-      return { ...updatedUser, message: "user updated successfully" };
-    } catch (err) {
-      return err;
-    }
-  }
   async userById(id: string) {
     try {
       const isCached = await this.cacheManager.get("users");

@@ -1,27 +1,41 @@
 /* eslint-disable prettier/prettier */
-import { IsNotEmpty, IsOptional } from "class-validator";
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsPhoneNumber,
+  MinLength,
+} from "class-validator";
 import { ApiProperty } from "@nestjs/swagger/dist/decorators";
 export class CreateRouterDto {
   @ApiProperty({ example: "mawlana" })
   @IsNotEmpty()
+  @MinLength(5)
   domainName: string;
   @ApiProperty()
+  @IsNotEmpty()
+  @IsPhoneNumber()
   settings: Settings;
+  @IsNotEmpty()
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   phoneNumber: string;
+  @IsNotEmpty()
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   whatsapp: string;
+  @IsNotEmpty()
   @ApiProperty()
   @IsOptional()
   schedule: Schedule;
   @ApiProperty({ example: "fayoum" })
+  @IsNotEmpty()
   location: string;
   @ApiProperty({ example: 300 })
+  @IsNotEmpty()
   @IsOptional()
   fees: number;
   @ApiProperty({ example: "hospital" })
+  @IsNotEmpty()
   type: Speciality;
 }
 type Schedule = {
