@@ -27,6 +27,7 @@ export class AuthService {
         where: {
           email,
         },
+        include: { routerAdmin: { select: { router: true } } },
       });
 
       if (user) {
@@ -60,6 +61,16 @@ export class AuthService {
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         },
       });
+      const routerAdmin = user.routerAdmin.map((d) => {
+        return {
+          domain: d.router.domain,
+          domainName: d.router.domainName,
+          rating: d.router.rating,
+          voters: d.router.voters,
+          type: d.router.type,
+        };
+      });
+      delete user.routerAdmin;
       delete user.password;
       delete user.info;
       delete user.address;
@@ -67,6 +78,7 @@ export class AuthService {
       return {
         message: "loged in successfully",
         ...user,
+        routerAdmin,
         access_token: this.jwtServise.sign({
           user: { userId: user.id, role: user.role, tokenId: token.id },
         }),

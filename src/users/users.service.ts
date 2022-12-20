@@ -32,7 +32,7 @@ export class UsersService {
 
   async userById(id: string) {
     try {
-      const isCached = await this.cacheManager.get("users");
+      const isCached = await this.cacheManager.get(`user${id}`);
       if (isCached) {
         return { isCached, message: "fetched all users successfully" };
       }
@@ -60,7 +60,11 @@ export class UsersService {
         };
       });
       delete user.routerAdmin;
-      await this.cacheManager.set(`user${id}`, user);
+      delete user.password;
+      await this.cacheManager.set(`user${id}`, {
+        ...user,
+        routerAdmin,
+      });
       return { ...user, routerAdmin, message: "user fetched successfully" };
     } catch (err) {
       return err;
