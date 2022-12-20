@@ -2,31 +2,14 @@
 
 import { IsOptional } from "class-validator";
 import { ApiProperty } from "@nestjs/swagger/dist/decorators";
+import { IsNotEmpty } from "class-validator";
 export class UpdatePageDto {
   @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ example: "test" })
   url: string;
   @IsOptional()
+  @IsNotEmpty()
   @ApiProperty({ example: { test: "test" } })
   page: object;
-}
-export class CreateCatDto {
-  @ApiProperty()
-  router: string;
-
-  @ApiProperty()
-  url: string;
-
-  @ApiProperty()
-  ex1: string;
-  @ApiProperty()
-  ex2: string;
-  @ApiProperty()
-  ex3: string;
-  @ApiProperty()
-  ex4: string;
-  @ApiProperty()
-  ex5: string;
-  @ApiProperty()
-  ex6: string;
 }

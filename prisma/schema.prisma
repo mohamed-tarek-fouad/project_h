@@ -228,7 +228,7 @@ model Specialities {
 
 model doctorSpeciality {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  specialityId String       @db.ObjectId
+  specialityId String
   speciality   Specialities @relation(fields: [specialityId], references: [id])
   doctorId     String       @db.ObjectId
   doctor       Users        @relation(fields: [doctorId], references: [id])
@@ -236,7 +236,7 @@ model doctorSpeciality {
 
 model routerSpecialities {
   id           String       @id @default(auto()) @map("_id") @db.ObjectId
-  specialityId String       @db.ObjectId
+  specialityId String
   speciality   Specialities @relation(fields: [specialityId], references: [id])
   routerId     String       @db.ObjectId
   router       Router       @relation(fields: [routerId], references: [domain])

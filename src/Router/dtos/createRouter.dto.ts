@@ -13,9 +13,9 @@ export class CreateRouterDto {
   domainName: string;
   @ApiProperty()
   @IsNotEmpty()
-  @IsPhoneNumber()
   settings: Settings;
   @IsNotEmpty()
+  @IsPhoneNumber()
   @ApiProperty({ example: "01006388619" })
   @IsOptional()
   phoneNumber: string;

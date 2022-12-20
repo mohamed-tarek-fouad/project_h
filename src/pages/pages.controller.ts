@@ -1,10 +1,10 @@
 /* eslint-disable prettier/prettier */
 import { Post, Body, Param, Patch, Get, Delete } from "@nestjs/common";
 import { Controller } from "@nestjs/common";
-import { CreatePageDto } from "./dtos/createPage.dto";
 import { PagesService } from "./pages.service";
 import { UpdatePageDto } from "./dtos/updatePage.dto";
 import { ApiParam } from "@nestjs/swagger";
+import { CreatePageDto } from "./dtos/createPage.dto";
 
 @Controller("pages")
 export class PagesController {
