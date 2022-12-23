@@ -59,7 +59,6 @@ export class RouterService {
         },
       });
       if (!routerExist) {
-        console.log(images);
         images.forEach(async (image) => {
           await fs.unlink(`./uploads/${image.filename}`, (err) => {
             if (err) {
@@ -72,7 +71,7 @@ export class RouterService {
       }
       let totalSize = routerExist.images ? routerExist.images.totalSize : 0;
 
-      const imagePath = [];
+      const imagePath = routerExist.images.images;
       images.forEach((element) => {
         totalSize = totalSize + parseInt(element.size);
         imagePath.push(element.filename);
@@ -83,15 +82,6 @@ export class RouterService {
         },
         data: { ...updateRouterDto, images: { images: imagePath, totalSize } },
       });
-      routerExist.images.images.forEach(async (element) => {
-        await fs.unlink(`./uploads/${element}`, (err) => {
-          if (err) {
-            console.error(err);
-            return err;
-          }
-        });
-      });
-
       await this.cacheManager.del("routers");
       await this.cacheManager.del(domain);
       return { ...updatedRoute, message: "router updated successfully" };
