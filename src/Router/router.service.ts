@@ -70,11 +70,10 @@ export class RouterService {
         throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
       }
       let totalSize = routerExist.images ? routerExist.images.totalSize : 0;
-
-      const imagePath = routerExist.images.images;
+      const imagePath = routerExist.images ? routerExist.images.images : [];
       images.forEach((element) => {
         totalSize = totalSize + parseInt(element.size);
-        imagePath.push(element.filename);
+        imagePath.push({ size: element.size, image: element.filename });
       });
       const updatedRoute = await this.prisma.router.update({
         where: {
@@ -82,6 +81,49 @@ export class RouterService {
         },
         data: { ...updateRouterDto, images: { images: imagePath, totalSize } },
       });
+      await this.cacheManager.del("routers");
+      await this.cacheManager.del(domain);
+      return { ...updatedRoute, message: "router updated successfully" };
+    } catch (err) {
+      return err;
+    }
+  }
+  async deleteImages(domain: string, image: string) {
+    try {
+      const routerExist = await this.prisma.router.findUnique({
+        where: {
+          domain,
+        },
+      });
+      if (!routerExist) {
+        throw new HttpException("router doesn't exist", HttpStatus.BAD_REQUEST);
+      }
+      const totalSize = routerExist.images ? routerExist.images.totalSize : 0;
+      const imagePath = routerExist.images.images.find((i) => {
+        return (i.image = image);
+      });
+      routerExist.images.images.splice(
+        routerExist.images.images.indexOf(imagePath),
+        1,
+      );
+      const updatedRoute = await this.prisma.router.update({
+        where: {
+          domain,
+        },
+        data: {
+          images: {
+            images: routerExist.images.images,
+            totalSize: totalSize - imagePath.size,
+          },
+        },
+      });
+      await fs.unlink(`./uploads/${imagePath.image}`, (err) => {
+        if (err) {
+          console.error(err);
+          return err;
+        }
+      });
+
       await this.cacheManager.del("routers");
       await this.cacheManager.del(domain);
       return { ...updatedRoute, message: "router updated successfully" };

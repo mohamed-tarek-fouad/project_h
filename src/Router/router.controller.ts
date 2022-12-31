@@ -59,6 +59,13 @@ export class RouterController {
   ) {
     return this.routerService.updateRouter(updateRouterDto, domain, images);
   }
+  @Patch("deleteImage/:domain/:images")
+  deleteImages(
+    @Param("domain") domain: string,
+    @Param("images") images: string,
+  ) {
+    return this.routerService.deleteImages(domain, images);
+  }
   @Get("routers/:search?")
   allRoutes(
     @Query("take") take?: string,

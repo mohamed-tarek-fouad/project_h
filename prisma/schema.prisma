@@ -197,8 +197,13 @@ type Settings {
 }
 
 type ImageStore {
-  images    String[]
-  totalSize Float    @default(0)
+  images    Image[]
+  totalSize Float   @default(0)
+}
+
+type Image {
+  image String
+  size  Float
 }
 
 model Pages {
